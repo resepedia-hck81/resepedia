@@ -74,10 +74,10 @@ export default class RecipeModel {
     }
   }
 
-  static async getRecipeById(id: string) {
+  static async getRecipeBySlug(slug: string) {
     const recipes = this.getCollection()
     try {
-      const recipe = await recipes.findOne({ _id: new ObjectId(id) })
+      const recipe = await recipes.findOne({ slug })
       if (!recipe) throw new CustomError("Recipe not found", 404)
       return recipe
     } catch (error) {
