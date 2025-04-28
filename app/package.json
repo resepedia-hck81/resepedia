@@ -12,6 +12,7 @@
     "@google/generative-ai": "^0.24.0",
     "@types/multer": "^1.4.12",
     "bcryptjs": "^3.0.2",
+    "daisyui": "^5.0.28",
     "jose": "^6.0.10",
     "mongodb": "^6.16.0",
     "multer": "^1.4.5-lts.2",
@@ -23,13 +24,13 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.1.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.1",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.1.4",
     "typescript": "^5"
   }
 }
