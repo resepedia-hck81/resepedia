@@ -22,7 +22,7 @@ interface IIngredient {
 interface IProductParam {
   page: number
   limit: number
-  sort: string
+  sort: number
   sortBy: string
   filter: string
   search: string
@@ -45,7 +45,7 @@ export default class RecipeModel {
       },
       {
         $match: params.filter
-          ? { region: params.filter}
+          ? { RegionId: +params.filter} // change to filter by name later
           : {},
       },
       {
