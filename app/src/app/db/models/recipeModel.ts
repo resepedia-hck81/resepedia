@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { getDB } from "../config/mongodb";
+import CustomError from "../exeptions/customError";
 
 
 interface IRecipe {
@@ -56,15 +57,32 @@ export default class RecipeModel {
       { $skip: skip },
       { $limit: params.limit },
     ]
-    const result = await recipes.aggregate<IRecipe>(aggregation).toArray()
-    const totalPages = Math.ceil((await recipes.countDocuments()) / params.limit)
-    const totalDataCount = await recipes.countDocuments()
-    return {
-      page: params.page,
-      totalPages,
-      dataCount: params.limit,
-      totalDataCount,
-      result
+    try {
+      const result = await recipes.aggregate<IRecipe>(aggregation).toArray()
+      const totalPages = Math.ceil((await recipes.countDocuments()) / params.limit)
+      const totalDataCount = await recipes.countDocuments()
+      return {
+        page: params.page,
+        totalPages,
+        dataCount: params.limit,
+        totalDataCount,
+        result
+      }
+    } catch (error) {
+      console.log("Error fetching recipes (model):", error)
+      return new CustomError("Internal Server Error", 500)
+    }
+  }
+
+  static async getRecipeById(id: string) {
+    const recipes = this.getCollection()
+    try {
+      const recipe = await recipes.findOne({ _id: new ObjectId(id) })
+      if (!recipe) throw new CustomError("Recipe not found", 404)
+      return recipe
+    } catch (error) {
+      console.log("Error fetching recipe by ID (model):", error)
+      return new CustomError("Internal Server Error", 500)
     }
   }
 }

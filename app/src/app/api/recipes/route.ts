@@ -1,7 +1,5 @@
 import CustomError from "@/app/db/exeptions/customError";
 import RecipeModel from "@/app/db/models/recipeModel";
-import { ZodError } from "zod";
-
 
 export async function GET(request: Request) {
   try {
@@ -12,31 +10,20 @@ export async function GET(request: Request) {
     const sortBy = searchParams.get("sortBy") === "name" ? "name" : "createdAt"
     const filter = searchParams.get("filter") || ""
     const search = searchParams.get("search") || ""
-
-    const recipes = await RecipeModel.getRecipes({
+    const result = await RecipeModel.getRecipes({
       page,
       limit,
       sort,
       sortBy,
       filter,
-      search,
-    });
-
-    return Response.json(recipes, { status: 200 });
+      search
+    })
+    return Response.json(result, { status: 200 })
   } catch (err) {
-    if (err instanceof ZodError) {
-      const error = err.errors[0];
-      return Response.json(
-        { message: `${error.path} - ${error.message}` },
-        { status: 400 }
-      );
-    }
+    console.log("Error fetching recipes (API):", err)
     if (err instanceof CustomError) {
-      return Response.json(
-        { message: err.message },
-        { status: err.status }
-      );
+      return Response.json({ message: err.message }, { status: err.status })
     }
-    return Response.json({ message: "ISE" }, { status: 500 });
+    return Response.json({ message: "ISE" }, { status: 500 })
   }
 }
