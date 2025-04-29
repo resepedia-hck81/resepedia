@@ -4,11 +4,11 @@ import CustomError from "../exeptions/customError";
 
 
 interface IRecipe {
-  _id: ObjectId
   name: string
+  slug: string
   imageUrl: string
   ingredients: IIngredient[]
-  instructions: string
+  instruction: string
   RegionId: ObjectId
   UserId: ObjectId
   createdAt: string
@@ -18,6 +18,15 @@ interface IRecipe {
 interface IIngredient {
   name: string
   measurement: string
+}
+
+interface IInput {
+  name: string
+  imageUrl: string
+  ingredients: IIngredient[]
+  instruction: string
+  RegionId: ObjectId
+  UserId: ObjectId
 }
 
 interface IProductParam {
@@ -82,6 +91,32 @@ export default class RecipeModel {
       return recipe
     } catch (error) {
       console.log("Error fetching recipe by ID (model):", error)
+      return new CustomError("Internal Server Error", 500)
+    }
+  }
+
+  static async postRecipe(input: IInput) {
+    const recipes = this.getCollection()
+    const { name, imageUrl, ingredients, instruction, RegionId, UserId } = input
+    const date = new Date()
+    const createdAt = date.toISOString()
+    const updatedAt = date.toISOString()
+    const slug = name.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-") + "-" + date.getTime()
+    try {
+      await recipes.insertOne({
+        name,
+        slug,
+        imageUrl,
+        ingredients,
+        instruction,
+        RegionId: new ObjectId(RegionId),
+        UserId: new ObjectId(UserId),
+        createdAt,
+        updatedAt
+      })
+      return "Recipe created successfully"
+    } catch (error) {
+      console.log("Error posting recipe (model):", error)
       return new CustomError("Internal Server Error", 500)
     }
   }
