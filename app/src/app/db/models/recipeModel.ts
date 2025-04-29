@@ -133,4 +133,32 @@ export default class RecipeModel {
       throw new CustomError("Internal Server Error", 500)
     }
   }
+
+  static async updateRecipeBySlug(slug: string, input: IInput) {
+    const recipes = this.getCollection()
+    recipeSchema.passthrough().parse(input)
+    const { name, imageUrl, ingredients, instruction, RegionId, UserId } = input
+    const date = new Date()
+    const updatedAt = date.toISOString()
+    try {
+      await recipes.updateOne(
+        { slug },
+        {
+          $set: {
+            name,
+            imageUrl,
+            ingredients,
+            instruction,
+            RegionId: new ObjectId(RegionId),
+            UserId: new ObjectId(UserId),
+            updatedAt
+          }
+        }
+      )
+      return "Recipe updated successfully"
+    } catch (error) {
+      console.log("Error updating recipe (model):", error)
+      return new CustomError("Internal Server Error", 500)
+    }
+  }
 }
