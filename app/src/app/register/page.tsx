@@ -1,7 +1,18 @@
-"use client";
+'use client'
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Register() {
+  const router = useRouter();
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Logika register bisa ditambahkan di sini
+    
+    // Redirect ke halaman login setelah register
+    router.push("/login");
+  };
+  
   return (
     <div className="flex min-h-screen">
       {/* Back arrow */}
@@ -33,7 +44,7 @@ export default function Register() {
           <h1 className="text-3xl font-bold text-gray-800 mb-6">
             Create an Account
           </h1>
-          <form className="flex flex-col gap-4">
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="UserName"

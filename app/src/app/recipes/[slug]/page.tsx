@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 // Contoh data resep (nantinya bisa diambil dari database)
 const recipeData = {
@@ -8,7 +9,7 @@ const recipeData = {
     id: 1,
     name: "Nasi Goreng",
     imageUrl:
-      "https://resepmamiku.com/wp-content/uploads/2023/05/Resep-Nasi-Goreng-Spesial.jpg",
+      "https://dcostseafood.id/wp-content/uploads/2023/04/Nasi-Goreng-Spesial.jpg",
     Region: { name: "Jawa" },
     ingredient1: "Nasi putih",
     measurement1: "2 piring",
@@ -122,17 +123,18 @@ const recipeData = {
   },
 };
 
-export default function RecipeDetail({ params }: { params: { slug: string } }) {
+export default function RecipeDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const unwrappedParams = use(params);
+  const slugValue = unwrappedParams.slug;
+  
   const [recipe, setRecipe] = useState<any>(null);
-  const [alternatives, setAlternatives] = useState<Record<string, string[]>>(
-    {}
-  );
+  const [alternatives, setAlternatives] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Simulasi fetch data
     const fetchData = () => {
-      const recipeId = parseInt(params.slug, 10);
+      const recipeId = parseInt(slugValue, 10);
       // Mengambil data resep berdasarkan ID
       const data = recipeData[recipeId as keyof typeof recipeData];
 
@@ -143,7 +145,7 @@ export default function RecipeDetail({ params }: { params: { slug: string } }) {
     };
 
     fetchData();
-  }, [params.slug]);
+  }, [slugValue]);
 
   const generateAlternatives = () => {
     // Contoh alternatif bahan
@@ -209,12 +211,14 @@ export default function RecipeDetail({ params }: { params: { slug: string } }) {
 
       <div className="text-center">
         <h1 className="mb-4 text-3xl font-bold text-gray-800">{recipe.name}</h1>
-        <div className="mb-6">
-          <img
+        <div className="mb-6 relative mx-auto" style={{ maxWidth: "600px", width: "100%", height: "400px" }}>
+          <Image
             src={recipe.imageUrl}
             alt={recipe.name}
-            className="rounded-lg mx-auto shadow-md"
-            style={{ maxWidth: "600px", width: "100%" }}
+            fill
+            sizes="(max-width: 600px) 100vw, 600px"
+            priority
+            className="rounded-lg shadow-md object-cover"
           />
         </div>
       </div>
@@ -264,10 +268,10 @@ export default function RecipeDetail({ params }: { params: { slug: string } }) {
                       key={index}
                       className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
                     >
-                      <td className="px-4 py-3 border-b whitespace-nowrap">
+                      <td className="px-4 py-3 border-b whitespace-nowrap text-gray-700">
                         {measurement}
                       </td>
-                      <td className="px-4 py-3 border-b whitespace-nowrap">
+                      <td className="px-4 py-3 border-b whitespace-nowrap text-gray-700">
                         {ingredient}
                       </td>
                       {Object.keys(alternatives).length > 0 && (
@@ -275,7 +279,7 @@ export default function RecipeDetail({ params }: { params: { slug: string } }) {
                           {alternative ? (
                             <ul className="list-disc list-inside">
                               {alternative.map((alt, i) => (
-                                <li key={i} className="text-gray-700">
+                                <li key={i} className="text-black">
                                   {alt}
                                 </li>
                               ))}
@@ -312,10 +316,10 @@ export default function RecipeDetail({ params }: { params: { slug: string } }) {
 
       <div className="text-center mt-10 mb-6">
         <Link
-          href="/"
+          href="/editrecipe"
           className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md inline-block"
         >
-          Back to Recipes
+          Edit Recipe
         </Link>
       </div>
     </div>
