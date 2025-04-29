@@ -161,4 +161,15 @@ export default class RecipeModel {
       return new CustomError("Internal Server Error", 500)
     }
   }
+
+  static async deleteRecipeBySlug(slug: string) {
+    const recipes = this.getCollection()
+    try {
+      await recipes.deleteOne({ slug })
+      return "Recipe deleted successfully"
+    } catch (error) {
+      console.log("Error deleting recipe (model):", error)
+      throw new CustomError("Internal Server Error", 500)
+    }
+  }
 }
