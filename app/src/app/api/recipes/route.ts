@@ -1,7 +1,21 @@
 import CustomError from "@/app/db/exeptions/customError";
 import RecipeModel from "@/app/db/models/recipeModel";
+import { NextRequest } from "next/server";
 
-export async function GET(request: Request) {
+interface IInput {
+  name: string
+  imageUrl: string
+  ingredients: IIngredient[]
+  instruction: string
+  RegionId: string
+}
+
+interface IIngredient {
+  name: string
+  measurement: string
+}
+
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1")
@@ -28,13 +42,31 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+	  const _id = request.headers.get("x-user-id");
+    if (!_id) {
+      return Response.json({ message: "Unauthorized" }, { status: 401 })
+    }
 
-    // call userbyid also regionid and validate
+    const body: IInput = await request.json()
+    const { name, imageUrl, ingredients, instruction } = body
+    if (!name) {
+      return Response.json({ message: "Name is required" }, { status: 400 })
+    }
+    if (!imageUrl) {
+      return Response.json({ message: "Image Url is required" }, { status: 400 })
+    }
+    if (ingredients.length < 1) {
+      return Response.json({ message: "At least put 1 ingredient" }, { status: 400 })
+    }
+    if (!instruction) {
+      return Response.json({ message: "Instruction is required" }, { status: 400 })
+    }
+    
+    // call regionid, then validate
 
-    const message = await RecipeModel.addRecipe(body)
+    const message = await RecipeModel.addRecipe({...body, UserId: _id})
     return Response.json(message, { status: 201 })
   } catch (err) {
     console.log("Error adding recipe (API):", err)

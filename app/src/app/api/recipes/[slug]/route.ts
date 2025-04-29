@@ -1,11 +1,12 @@
 import CustomError from "@/app/db/exeptions/customError"
 import RecipeModel from "@/app/db/models/recipeModel"
+import { NextRequest } from "next/server"
 
 interface IProps {
   params: Promise<{ slug: string }>
 }
 
-export async function GET(request: Request, Props: IProps) {
+export async function GET(request: NextRequest, Props: IProps) {
   try {
     const { slug } = await Props.params
     const recipe = await RecipeModel.getRecipeBySlug(slug)

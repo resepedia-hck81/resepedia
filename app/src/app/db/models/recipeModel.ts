@@ -91,7 +91,7 @@ export default class RecipeModel {
       }
     } catch (error) {
       console.log("Error fetching recipes (model):", error)
-      return new CustomError("Internal Server Error", 500)
+      throw new CustomError("Internal Server Error", 500)
     }
   }
 
@@ -103,7 +103,7 @@ export default class RecipeModel {
       return recipe
     } catch (error) {
       console.log("Error fetching recipe by ID (model):", error)
-      return new CustomError("Internal Server Error", 500)
+      throw new CustomError("Internal Server Error", 500)
     }
   }
 
@@ -130,7 +130,7 @@ export default class RecipeModel {
       return "Recipe created successfully"
     } catch (error) {
       console.log("Error posting recipe (model):", error)
-      return new CustomError("Internal Server Error", 500)
+      throw new CustomError("Internal Server Error", 500)
     }
   }
 }
