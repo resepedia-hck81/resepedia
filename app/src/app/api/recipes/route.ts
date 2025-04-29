@@ -27,3 +27,17 @@ export async function GET(request: Request) {
     return Response.json({ message: "ISE" }, { status: 500 })
   }
 }
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    const message = await RecipeModel.addRecipe(body)
+    return Response.json(message, { status: 201 })
+  } catch (err) {
+    console.log("Error adding recipe (API):", err)
+    if (err instanceof CustomError) {
+      return Response.json({ message: err.message }, { status: err.status })
+    }
+    return Response.json({ message: "ISE" }, { status: 500 })
+  }
+}

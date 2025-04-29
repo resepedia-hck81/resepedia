@@ -2,7 +2,6 @@ import { ObjectId } from "mongodb";
 import { getDB } from "../config/mongodb";
 import CustomError from "../exeptions/customError";
 
-
 interface IRecipe {
   name: string
   slug: string
@@ -95,7 +94,7 @@ export default class RecipeModel {
     }
   }
 
-  static async postRecipe(input: IInput) {
+  static async addRecipe(input: IInput) {
     const recipes = this.getCollection()
     const { name, imageUrl, ingredients, instruction, RegionId, UserId } = input
     const date = new Date()
