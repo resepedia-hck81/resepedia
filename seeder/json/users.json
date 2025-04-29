@@ -1,8 +1,8 @@
 [
   {
     "_id": 1,
-    "email": "user1@mail.com",
-    "username": "user1",
+    "email": "resepedia@mail.com",
+    "username": "resepedia",
     "password": "$2b$10$kTCNQXXKttmwXuktGgXZVugUrJmUqlGSO5qw1gPQS1SJ.P9j3.BNu",
     "isPremium": true,
     "tokenCount": 7,
