@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { getDB } from "../config/mongodb";
 import CustomError from "../exeptions/customError";
+import { z } from "zod";
 
 interface IRecipe {
   name: string
@@ -24,8 +25,8 @@ interface IInput {
   imageUrl: string
   ingredients: IIngredient[]
   instruction: string
-  RegionId: ObjectId
-  UserId: ObjectId
+  RegionId: string
+  UserId: string
 }
 
 interface IProductParam {
@@ -36,6 +37,18 @@ interface IProductParam {
   filter: string
   search: string
 }
+
+const recipeSchema = z.object({
+  name: z.string(),
+  imageUrl: z.string(),
+  ingredients: z.array(
+    z.object({
+      name: z.string(),
+      measurement: z.string()
+    })
+  ),
+  instruction: z.string()
+})
 
 export default class RecipeModel {
   static getCollection() {
@@ -96,6 +109,7 @@ export default class RecipeModel {
 
   static async addRecipe(input: IInput) {
     const recipes = this.getCollection()
+    recipeSchema.passthrough().parse(input)
     const { name, imageUrl, ingredients, instruction, RegionId, UserId } = input
     const date = new Date()
     const createdAt = date.toISOString()

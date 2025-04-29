@@ -31,6 +31,9 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
+
+    // call userbyid also regionid and validate
+
     const message = await RecipeModel.addRecipe(body)
     return Response.json(message, { status: 201 })
   } catch (err) {
