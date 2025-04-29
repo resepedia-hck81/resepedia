@@ -1,0 +1,12 @@
+[
+  {
+    "_id": 1,
+    "email": "user1@mail.com",
+    "username": "user1",
+    "password": "$2b$10$kTCNQXXKttmwXuktGgXZVugUrJmUqlGSO5qw1gPQS1SJ.P9j3.BNu",
+    "isPremium": true,
+    "tokenCount": 7,
+    "createdAt": "2025-04-28T12:53:14.993Z",
+    "updatedAt": "2025-04-28T12:53:14.993Z"
+  }
+]
