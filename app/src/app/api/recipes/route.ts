@@ -2,7 +2,7 @@ import CustomError from "@/app/db/exeptions/customError";
 import RecipeModel from "@/app/db/models/recipeModel";
 import { NextRequest, NextResponse } from "next/server";
 
-interface IInput {
+export interface IInput {
   name: string
   imageUrl: string
   ingredients: IIngredient[]
