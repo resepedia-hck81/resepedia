@@ -162,10 +162,12 @@ export default class RecipeModel {
     }
   }
 
-  static async deleteRecipeBySlug(slug: string) {
+  static async deleteRecipeBySlug(slug: string, UserId: string) {
     const recipes = this.getCollection()
     try {
-      await recipes.deleteOne({ slug })
+      const result = await recipes.deleteOne({ slug, UserId: new ObjectId(UserId) })
+      console.log("result", result); // need validate
+      if (result.deletedCount === 0) throw new CustomError("Forbidden", 403)
       return "Recipe deleted successfully"
     } catch (error) {
       console.log("Error deleting recipe (model):", error)

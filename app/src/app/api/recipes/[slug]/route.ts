@@ -52,3 +52,21 @@ export async function PUT(request: NextRequest, Props: IProps) {
     return NextResponse.json({ message: "ISE" }, { status: 500 })
   }
 }
+
+export async function DELETE(request: NextRequest, Props: IProps) {
+  try {
+    const _id = request.headers.get("x-user-id")
+    if (!_id) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+    }
+    const { slug } = await Props.params
+    const recipe = await RecipeModel.deleteRecipeBySlug(slug, _id)
+    return NextResponse.json(recipe, { status: 200 })
+  } catch (err) {
+    console.log("Error deleting recipe (API):", err)
+    if (err instanceof CustomError) {
+      return NextResponse.json({ message: err.message }, { status: err.status })
+    }
+    return NextResponse.json({ message: "ISE" }, { status: 500 })
+  }
+}
