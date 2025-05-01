@@ -10,10 +10,86 @@ export default function Profile() {
     tokenCount: 4
   });
 
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  
   const totalTokens = 7;
+
+  const openPremiumModal = (e) => {
+    e.preventDefault();
+    setShowPremiumModal(true);
+  };
+
+  const closePremiumModal = () => {
+    setShowPremiumModal(false);
+  };
+
+  const proceedToPayment = () => {
+    // Here you would integrate with Midtrans
+    // For now, just redirect to the premium page
+    window.location.href = "/premium";
+  };
 
   return (
     <div className="container max-w-5xl mx-auto py-8 px-4">
+{/* Premium Modal */}
+{showPremiumModal && (
+  <div className="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-50 p-4">
+    <div className="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden animate-fade-in">
+      <div className="bg-gradient-to-r from-red-600 to-red-800 p-4 text-white">
+        <h2 className="text-xl font-bold">Upgrade to Premium</h2>
+      </div>
+      <div className="p-6">
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">Premium Benefits</h3>
+          <ul className="space-y-2">
+            <li className="flex items-start">
+              <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="text-black">Unlimited tokens for generating alternative ingredients</span>
+            </li>
+            <li className="flex items-start">
+              <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="text-black">Unlimited tokens for generating recipes by name</span>
+            </li>
+            <li className="flex items-start">
+              <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="text-black">Unlimited tokens for generating recipes by image</span>
+            </li>
+          </ul>
+        </div>
+        
+        <div className="bg-gray-50 p-4 rounded-lg mb-6">
+          <div className="flex justify-between items-center mb-2">
+            <span className="font-semibold text-black">Premium Membership</span>
+            <span className="text-xl font-bold text-black">Rp 99.000</span>
+          </div>
+          <p className="text-sm text-gray-600">Unlimited access for 30 days</p>
+        </div>
+        
+        <div className="flex space-x-3">
+          <button
+            onClick={proceedToPayment}
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md font-medium transition-colors"
+          >
+            Let's get Premium!
+          </button>
+          <button
+            onClick={closePremiumModal}
+            className="flex-1 border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 px-4 rounded-md font-medium transition-colors"
+          >
+            Try Later
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+      
       <div className="mb-4">
         <Link href="/" className="inline-block text-gray-700 hover:text-red-600 transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
@@ -55,9 +131,12 @@ export default function Profile() {
                   </div>
                 </div>
                 {!user.isPremium && (
-                  <Link href="/premium" className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm inline-block transition-colors">
+                  <button 
+                    onClick={openPremiumModal}
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm inline-block transition-colors"
+                  >
                     Upgrade to Premium
-                  </Link>
+                  </button>
                 )}
               </div>
             </div>
@@ -85,9 +164,12 @@ export default function Profile() {
                   </div>
                 </div>
                 {!user.isPremium && user.tokenCount === 0 && (
-                  <Link href="/premium" className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm inline-block transition-colors">
+                  <button 
+                    onClick={openPremiumModal}
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm inline-block transition-colors"
+                  >
                     Get More Tokens
-                  </Link>
+                  </button>
                 )}
               </div>
 

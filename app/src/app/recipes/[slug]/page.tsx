@@ -123,12 +123,18 @@ const recipeData = {
   },
 };
 
-export default function RecipeDetail({ params }: { params: Promise<{ slug: string }> }) {
+export default function RecipeDetail({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const unwrappedParams = use(params);
   const slugValue = unwrappedParams.slug;
-  
+
   const [recipe, setRecipe] = useState<any>(null);
-  const [alternatives, setAlternatives] = useState<Record<string, string[]>>({});
+  const [alternatives, setAlternatives] = useState<Record<string, string[]>>(
+    {}
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -148,17 +154,32 @@ export default function RecipeDetail({ params }: { params: Promise<{ slug: strin
   }, [slugValue]);
 
   const generateAlternatives = () => {
-    // Contoh alternatif bahan
+    // Contoh alternatif bahan dengan tepat 3 opsi untuk setiap bahan
     const alt: Record<string, string[]> = {
-      "Bawang merah": ["Bawang bombay", "Daun bawang"],
-      "Bawang putih": ["Bawang putih bubuk", "Shallot"],
+      "Bawang merah": ["Bawang bombay", "Daun bawang", "Bawang merah bubuk"],
+      "Bawang putih": ["Bawang putih bubuk", "Shallot", "Garlic paste"],
       "Cabai merah": ["Cabai rawit", "Cabai bubuk", "Paprika"],
-      "Santan kental": ["Santan instan", "Krim kelapa"],
-      "Tepung beras": ["Tepung sagu", "Tepung maizena"],
-      "Nasi putih": ["Nasi merah", "Nasi shirataki"],
-      Telur: ["Telur puyuh", "Tahu"],
+      "Santan kental": ["Santan instan", "Krim kelapa", "Yogurt"],
+      "Tepung beras": ["Tepung sagu", "Tepung maizena", "Tepung tapioka"],
+      "Nasi putih": ["Nasi merah", "Nasi shirataki", "Quinoa"],
+      Telur: ["Telur puyuh", "Tahu", "Telur bebek"],
       "Daging sapi": ["Daging ayam", "Daging kambing", "Protein nabati"],
       Ayam: ["Daging sapi", "Daging kambing", "Tahu atau tempe"],
+      Jahe: ["Jahe bubuk", "Lengkuas", "Kapulaga"],
+      Kunyit: ["Kunyit bubuk", "Saffron", "Kunyit asam jamu"],
+      Sereh: ["Sereh bubuk", "Daun kari", "Jeruk purut"],
+      Serai: ["Sereh bubuk", "Daun kari", "Jeruk purut"],
+      "Daun jeruk": ["Kulit jeruk", "Daun kari", "Jeruk nipis"],
+      "Daun salam": ["Bay leaf", "Daun pandan", "Lengkuas"],
+      Garam: ["Garam himalaya", "Kecap asin", "Kaldu bubuk"],
+      "Minyak goreng": ["Minyak zaitun", "Minyak kelapa", "Margarin"],
+      "Kecap manis": ["Saus tiram", "Gula jawa cair", "Madu"],
+      "Kaldu bubuk": ["Kaldu jamur", "MSG", "Garam himalaya"],
+      "Daun bawang": ["Bawang bombay", "Seledri", "Daun ketumbar"],
+      Jintan: ["Jintan bubuk", "Adas", "Ketumbar"],
+      Lengkuas: ["Jahe", "Lengkuas bubuk", "Kunyit"],
+      Air: ["Kaldu ayam", "Kaldu sapi", "Air kelapa"],
+      "Tusuk sate": ["Tusuk bambu", "Tusuk stainless", "Batang serai"],
     };
 
     setAlternatives(alt);
@@ -211,7 +232,10 @@ export default function RecipeDetail({ params }: { params: Promise<{ slug: strin
 
       <div className="text-center">
         <h1 className="mb-4 text-3xl font-bold text-gray-800">{recipe.name}</h1>
-        <div className="mb-6 relative mx-auto" style={{ maxWidth: "600px", width: "100%", height: "400px" }}>
+        <div
+          className="mb-6 relative mx-auto"
+          style={{ maxWidth: "600px", width: "100%", height: "400px" }}
+        >
           <Image
             src={recipe.imageUrl}
             alt={recipe.name}
@@ -240,17 +264,17 @@ export default function RecipeDetail({ params }: { params: Promise<{ slug: strin
         </div>
 
         <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-200 rounded-lg">
+          <table className="min-w-full border-2 border-gray-300 rounded-lg">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-4 py-3 text-left text-gray-700 font-semibold border-b whitespace-nowrap">
+                <th className="px-4 py-3 text-left text-gray-700 font-semibold border-2 border-gray-300 whitespace-nowrap">
                   Measurement
                 </th>
-                <th className="px-4 py-3 text-left text-gray-700 font-semibold border-b whitespace-nowrap">
+                <th className="px-4 py-3 text-left text-gray-700 font-semibold border-2 border-gray-300 whitespace-nowrap">
                   Ingredient
                 </th>
                 {Object.keys(alternatives).length > 0 && (
-                  <th className="px-4 py-3 text-left text-gray-700 font-semibold border-b">
+                  <th className="px-4 py-3 text-left text-gray-700 font-semibold border-2 border-gray-300">
                     Alternative Ingredients
                   </th>
                 )}
@@ -268,24 +292,25 @@ export default function RecipeDetail({ params }: { params: Promise<{ slug: strin
                       key={index}
                       className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
                     >
-                      <td className="px-4 py-3 border-b whitespace-nowrap text-gray-700">
+                      <td className="px-4 py-3 border-2 border-gray-300 whitespace-nowrap text-gray-700">
                         {measurement}
                       </td>
-                      <td className="px-4 py-3 border-b whitespace-nowrap text-gray-700">
+                      <td className="px-4 py-3 border-2 border-gray-300 whitespace-nowrap text-gray-700 font-medium">
                         {ingredient}
                       </td>
                       {Object.keys(alternatives).length > 0 && (
-                        <td className="px-4 py-3 border-b">
-                          {alternative ? (
-                            <ul className="list-disc list-inside">
+                        <td className="px-4 py-3 border-2 border-gray-300">
+                          {alternative && (
+                            <div className="flex flex-wrap gap-2">
                               {alternative.map((alt, i) => (
-                                <li key={i} className="text-black">
+                                <span
+                                  key={i}
+                                  className="bg-red-50 text-red-700 text-sm px-2 py-1 rounded-md border border-red-100"
+                                >
                                   {alt}
-                                </li>
+                                </span>
                               ))}
-                            </ul>
-                          ) : (
-                            ""
+                            </div>
                           )}
                         </td>
                       )}
