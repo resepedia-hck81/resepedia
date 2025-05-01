@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/api")) {
     if (request.nextUrl.pathname.startsWith("/api/recipes")) {
       const token = await findCookies()
-      if (!token) return new Response("Unauthorized", { status: 401 })
+      if (!token) return
       return authentication(token)
     }
   }
