@@ -1,15 +1,15 @@
 import { ObjectId } from "mongodb";
 import { getDB } from "../config/mongodb";
 import CustomError from "../exeptions/customError";
+import { z } from "zod";
 import { generateContent } from "../helpers/gemini";
 
-
 interface IRecipe {
-  _id: ObjectId
   name: string
+  slug: string
   imageUrl: string
   ingredients: IIngredient[]
-  instructions: string
+  instruction: string
   RegionId: ObjectId
   UserId: ObjectId
   createdAt: string
@@ -21,6 +21,15 @@ interface IIngredient {
   measurement: string
 }
 
+interface IInput {
+  name: string
+  imageUrl: string
+  ingredients: IIngredient[]
+  instruction: string
+  RegionId: string
+  UserId: string
+}
+
 interface IProductParam {
   page: number
   limit: number
@@ -29,6 +38,18 @@ interface IProductParam {
   filter: string
   search: string
 }
+
+const recipeSchema = z.object({
+  name: z.string(),
+  imageUrl: z.string(),
+  ingredients: z.array(
+    z.object({
+      name: z.string(),
+      measurement: z.string()
+    })
+  ),
+  instruction: z.string()
+})
 
 export default class RecipeModel {
   static getCollection() {
@@ -71,7 +92,7 @@ export default class RecipeModel {
       }
     } catch (error) {
       console.log("Error fetching recipes (model):", error)
-      return new CustomError("Internal Server Error", 500)
+      throw new CustomError("Internal Server Error", 500)
     }
   }
 
@@ -83,7 +104,75 @@ export default class RecipeModel {
       return recipe
     } catch (error) {
       console.log("Error fetching recipe by ID (model):", error)
+      throw new CustomError("Internal Server Error", 500)
+    }
+  }
+
+  static async addRecipe(input: IInput) {
+    const recipes = this.getCollection()
+    recipeSchema.passthrough().parse(input)
+    const { name, imageUrl, ingredients, instruction, RegionId, UserId } = input
+    const date = new Date()
+    const createdAt = date.toISOString()
+    const updatedAt = date.toISOString()
+    const slug = name.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-") + "-" + date.getTime()
+    try {
+      await recipes.insertOne({
+        name,
+        slug,
+        imageUrl,
+        ingredients,
+        instruction,
+        RegionId: new ObjectId(RegionId),
+        UserId: new ObjectId(UserId),
+        createdAt,
+        updatedAt
+      })
+      return "Recipe created successfully"
+    } catch (error) {
+      console.log("Error posting recipe (model):", error)
+      throw new CustomError("Internal Server Error", 500)
+    }
+  }
+
+  static async updateRecipeBySlug(slug: string, input: IInput) {
+    const recipes = this.getCollection()
+    recipeSchema.passthrough().parse(input)
+    const { name, imageUrl, ingredients, instruction, RegionId, UserId } = input
+    const date = new Date()
+    const updatedAt = date.toISOString()
+    try {
+      await recipes.updateOne(
+        { slug },
+        {
+          $set: {
+            name,
+            imageUrl,
+            ingredients,
+            instruction,
+            RegionId: new ObjectId(RegionId),
+            UserId: new ObjectId(UserId),
+            updatedAt
+          }
+        }
+      )
+      return "Recipe updated successfully"
+    } catch (error) {
+      console.log("Error updating recipe (model):", error)
       return new CustomError("Internal Server Error", 500)
+    }
+  }
+
+  static async deleteRecipeBySlug(slug: string, UserId: string) {
+    const recipes = this.getCollection()
+    try {
+      const result = await recipes.deleteOne({ slug, UserId: new ObjectId(UserId) })
+      console.log("result", result); // need validate
+      if (result.deletedCount === 0) throw new CustomError("Forbidden", 403)
+      return "Recipe deleted successfully"
+    } catch (error) {
+      console.log("Error deleting recipe (model):", error)
+      throw new CustomError("Internal Server Error", 500)
     }
   }
 
