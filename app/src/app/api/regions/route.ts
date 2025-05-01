@@ -1,4 +1,4 @@
-import RegionModel from "@/app/db/models/RegionModel";
+import RegionModel from "@/db/models/RegionModel";
 import { NextResponse } from "next/server";
 
 export async function GET() {
