@@ -1,5 +1,5 @@
-import CustomError from "@/app/db/exeptions/customError"
-import RecipeModel from "@/app/db/models/recipeModel"
+import CustomError from "@/db/exeptions/customError"
+import RecipeModel from "@/db/models/recipeModel"
 import { NextRequest, NextResponse } from "next/server"
 import { IInput } from "../route"
 
