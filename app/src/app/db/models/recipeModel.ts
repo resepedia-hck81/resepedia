@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { getDB } from "../config/mongodb";
 import CustomError from "../exeptions/customError";
 import { z } from "zod";
+import { generateContent } from "../helpers/gemini";
 
 interface IRecipe {
   name: string
@@ -172,6 +173,27 @@ export default class RecipeModel {
     } catch (error) {
       console.log("Error deleting recipe (model):", error)
       throw new CustomError("Internal Server Error", 500)
+    }
+  }
+
+  static async generateAlternatives(slug: string) {
+    const recipes = this.getCollection();
+    try {
+      const recipe = await recipes.findOne({ slug });
+      if (!recipe) throw new CustomError("Recipe not found", 404);
+      const ingredients = recipe.ingredients.map(
+        (ingredient) => ingredient.name
+      );
+      const prompt = `Create a JSON array of objects, format: {Ingredient: [alternative1, alternative2, ...]}. Ensure each ingredient has exactly 3 alternatives. Exact keys: ${ingredients}`;
+      const result = await generateContent(prompt);
+      try {
+        const parsedResult = JSON.parse(result.replace(/^```json\n|```$/g, ""));
+        return parsedResult;
+      } catch {
+        return new CustomError("Failed to parse generated content", 500);
+      }
+    } catch {
+      return new CustomError("Internal Server Error", 500);
     }
   }
 }
