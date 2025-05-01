@@ -16,4 +16,9 @@ export default class RegionModel {
     const regions = await collection.find().toArray();
     return regions;
   }
+  static async getRegionById(id: string) {
+    const collection = this.getCollection();
+    const region = await collection.findOne({ _id: new ObjectId(id) });
+    return region;
+  }
 }
