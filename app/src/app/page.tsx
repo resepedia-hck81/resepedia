@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getRecipes, getRegions } from "./action";
 import CardRecipe from "./components/CardRecipe";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 interface IRecipeData {
   page: number;
@@ -47,19 +48,21 @@ export default function Home() {
     totalDataCount: 0,
     result: [],
   });
+
+  console.log(recipes);
+
   const [regions, setRegions] = useState<IRegion[]>([]);
 
   const [search, setSearch] = useState("");
   const [region, setRegion] = useState("");
-  const [page, setPage] = useState(1);
 
   async function fetchRecipes() {
-    const response = await getRecipes(search, region, page);
+    const response = await getRecipes(search, region, recipes.page);
     if (response.error) {
       return <h1>RECIPES NOT FOUND</h1>;
     }
     const data: IRecipeData = response.data;
-    if (page === 1) {
+    if (recipes.page === 1) {
       setRecipes(data);
     } else {
       setRecipes((prev) => ({
@@ -84,10 +87,15 @@ export default function Home() {
 
   useEffect(() => {
     fetchRecipes();
-  }, [search, region, page]);
+  }, [search, region, recipes.page]);
 
   useEffect(() => {
-    setPage(1);
+    setRecipes((prev) => ({
+      ...prev,
+      page: 1,
+      result: [],
+    }));
+    fetchRecipes();
   }, [search, region]);
 
   return (
@@ -205,23 +213,22 @@ export default function Home() {
           </div>
 
           {/* Recipe Card Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {/* Recipe Card */}
+          <InfiniteScroll
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+            dataLength={recipes.result.length}
+            next={() =>
+              setRecipes((prev) => ({ ...prev, page: prev.page + 1 }))
+            }
+            hasMore={recipes.page < recipes.totalPages}
+            loader={
+              <span className="loading loading-bars loading-lg text-red-600"></span>
+            }
+            scrollThreshold={0.9}
+          >
             {recipes.result.map((recipe) => (
               <CardRecipe key={recipe._id} recipe={recipe} />
             ))}
-          </div>
-
-          <div className="text-center mt-8">
-            <button
-              onClick={() => {
-                setPage(page + 1);
-              }}
-              className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-full text-lg inline-block"
-            >
-              Load More
-            </button>
-          </div>
+          </InfiniteScroll>
         </div>
       </div>
     </div>
