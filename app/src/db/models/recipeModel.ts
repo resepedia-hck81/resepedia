@@ -60,7 +60,7 @@ export default class RecipeModel {
   static async getRecipes(params: IProductParam) {
     const recipes = this.getCollection()
     const skip = (params.page - 1) * params.limit
-    const aggregation = [ 
+    const pipeline = [ 
       {
         $match: params.search
           ? { name: { $regex: params.search, $options: "i" } } 
@@ -78,9 +78,34 @@ export default class RecipeModel {
       },
       { $skip: skip },
       { $limit: params.limit },
+      {
+        $lookup: {
+          from: 'regions',
+          localField: 'RegionId',
+          foreignField: '_id',
+          as: 'regions'
+        }
+      },
+      { $unwind: { path: '$regions' } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'UserId',
+          foreignField: '_id',
+          as: 'user'
+        }
+      },
+      { $unwind: { path: '$user' } },
+      {
+        $addFields: {
+          region: '$regions.name',
+          author: '$user.username'
+        }
+      },
+      { $project: { regions: 0, user: 0 } }
     ]
     try {
-      const result = await recipes.aggregate<IRecipe>(aggregation).toArray()
+      const result = await recipes.aggregate<IRecipe>(pipeline).toArray()
       const totalPages = Math.ceil((await recipes.countDocuments()) / params.limit)
       const totalDataCount = await recipes.countDocuments()
       return {
@@ -98,8 +123,38 @@ export default class RecipeModel {
 
   static async getRecipeBySlug(slug: string) {
     const recipes = this.getCollection()
+    const pipeline = [
+      {
+        $match: { slug }
+      },
+      {
+        $lookup: {
+          from: 'regions',
+          localField: 'RegionId',
+          foreignField: '_id',
+          as: 'regions'
+        }
+      },
+      { $unwind: { path: '$regions' } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'UserId',
+          foreignField: '_id',
+          as: 'user'
+        }
+      },
+      { $unwind: { path: '$user' } },
+      {
+        $addFields: {
+          region: '$regions.name',
+          author: '$user.username'
+        }
+      },
+      { $project: { regions: 0, user: 0 } }
+    ]
     try {
-      const recipe = await recipes.findOne({ slug })
+      const recipe = await recipes.aggregate<IRecipe>(pipeline).toArray()
       if (!recipe) throw new CustomError("Recipe not found", 404)
       return recipe
     } catch (error) {
