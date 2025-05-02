@@ -1,12 +1,12 @@
 {
   "dependencies": {
-    "mongodb": "^6.16.0"
+    "mongodb": "^6.16.0",
+    "seeder": "file:"
   },
   "name": "seeder",
   "type": "module",
   "version": "1.0.0",
   "main": "seed.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

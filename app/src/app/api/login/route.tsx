@@ -9,9 +9,11 @@ export async function POST(request: NextRequest) {
 		const user = await User.where("email", email).orWhere("username", username).firstOrFail();
 		if (!(await compare(password, user.password))) return new NextResponse("Invalid username or password", { status: 401 });
 		const token = await sign({ _id: user._id, email: user.email }, true);
-		return new NextResponse(JSON.stringify({ token }), { status: 200 }).cookies.set("token", token, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 7 });
+		const resp = NextResponse.json({ message: "Success" }, { status: 200 });
+		resp.cookies.set("token", token, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 7 });
+		return resp;
 	} catch (err) {
 		console.log(err);
-		return new NextResponse("Internal Server Error", { status: 500 });
+		return NextResponse.json({ message: "ISE" }, { status: 500 });
 	}
 }
