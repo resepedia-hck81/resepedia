@@ -64,20 +64,8 @@ export default class RecipeModel {
       {
         $match: params.search
           ? { name: { $regex: params.search, $options: "i" } } 
-          : {}, 
-      },
-      {
-        $match: params.filter
-          ? { RegionId: +params.filter} // change to filter by name later
           : {},
       },
-      {
-        $sort: params.sortBy
-          ? { [params.sortBy]: params.sort }
-          : {},
-      },
-      { $skip: skip },
-      { $limit: params.limit },
       {
         $lookup: {
           from: 'regions',
@@ -86,7 +74,34 @@ export default class RecipeModel {
           as: 'regions'
         }
       },
-      { $unwind: { path: '$regions' } },
+      { $unwind: { path: '$regions', preserveNullAndEmptyArrays: true } },
+      {
+        $addFields: {
+          region: '$regions.name',
+        }
+      },
+      {
+        $match: params.filter
+          ? { region: params.filter} 
+          : {},
+      },
+    ]
+    const extendedPipeline = [
+      ...pipeline,
+      {
+        $addFields: {
+          sortField: {
+            $toLower: `$${params.sortBy}`, 
+          },
+        },
+      },
+      {
+        $sort: params.sortBy
+          ? { sortField: params.sort }
+          : { sortField: -1 },
+      },
+      { $skip: skip },
+      { $limit: params.limit },
       {
         $lookup: {
           from: 'users',
@@ -95,23 +110,22 @@ export default class RecipeModel {
           as: 'user'
         }
       },
-      { $unwind: { path: '$user' } },
+      { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
       {
         $addFields: {
-          region: '$regions.name',
           author: '$user.username'
         }
       },
       { $project: { regions: 0, user: 0 } }
     ]
     try {
-      const result = await recipes.aggregate<IRecipe>(pipeline).toArray()
-      const totalPages = Math.ceil((await recipes.countDocuments()) / params.limit)
-      const totalDataCount = await recipes.countDocuments()
+      const result = await recipes.aggregate<IRecipe>(extendedPipeline).toArray()
+      const totalDataCount = (await recipes.aggregate(pipeline).toArray()).length
+      const totalPages = Math.ceil(totalDataCount / params.limit)
       return {
         page: params.page,
         totalPages,
-        dataCount: params.limit,
+        dataCount: result.length,
         totalDataCount,
         result
       }
