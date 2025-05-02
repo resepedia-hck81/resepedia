@@ -1,107 +1,121 @@
-'use client'
+"use client";
+import { getRegions } from "@/app/action";
+import { IRecipe, IRegion } from "@/app/page";
+import { getRecipeBySlug } from "@/app/recipes/[slug]/action";
 import Link from "next/link";
-import { useState, useEffect, ChangeEvent, FormEvent } from "react";
-
-interface Ingredient {
-  measurement: string;
-  ingredient: string;
-}
-
-// Definisikan tipe untuk Recipe
-interface Recipe {
-  name: string;
-  instructions: string;
-  regionId: string;
-}
+import { useParams } from "next/navigation";
+import { useState, useEffect, ChangeEvent } from "react";
 
 export default function EditRecipe() {
-  const [ingredients, setIngredients] = useState<Ingredient[]>([
-    { measurement: "2 tablespoons", ingredient: "Olive oil" },
-    { measurement: "1 kg", ingredient: "Chicken thighs" },
-    { measurement: "4 cloves", ingredient: "Garlic, minced" },
-    { measurement: "", ingredient: "" }
-  ]);
+  const { slug } = useParams<{ slug: string }>();
 
-  const [recipe, setRecipe] = useState<Recipe>({
-    name: "Chicken Cacciatore",
-    instructions: "1. Heat olive oil in a large skillet over medium-high heat.\n2. Season chicken with salt and pepper, then add to the skillet. Cook until browned on both sides.\n3. Add garlic and cook for 1 minute until fragrant.\n4. Add tomatoes, bell peppers, and herbs. Stir to combine.\n5. Reduce heat to low, cover, and simmer for 30 minutes.\n6. Serve hot with pasta or crusty bread.",
-    regionId: "1"
+  const [recipe, setRecipe] = useState<IRecipe>({
+    _id: "",
+    name: "",
+    slug: "",
+    imageUrl: "",
+    ingredients: [],
+    instruction: "",
+    RegionId: "",
+    UserId: "",
+    createdAt: "",
+    updatedAt: "",
+    region: "",
+    author: "",
   });
+  const [regions, setRegions] = useState<IRegion[]>([]);
 
-  const handleIngredientChange = (index: number, field: keyof Ingredient, value: string): void => {
-    const newIngredients = [...ingredients];
-    newIngredients[index][field] = value;
-    
-    // Pastikan hanya ada satu baris kosong di akhir
-    const cleanedIngredients = newIngredients.filter((item, idx) => {
-      // Jika bukan baris terakhir, simpan semua yang tidak kosong
-      if (idx < newIngredients.length - 1) {
-        return item.measurement.trim() !== "" || item.ingredient.trim() !== "";
-      }
-      // Selalu simpan baris terakhir
-      return true;
-    });
-    
-    setIngredients(cleanedIngredients);
-  };
+  async function fetchRecipe() {
+    const response = await getRecipeBySlug(slug);
+    if (response.error) {
+      return <h1>NOT FOUND</h1>;
+    }
+    const data: IRecipe = response.data;
+    setRecipe(data);
+  }
 
-  const handleRecipeChange = (field: keyof Recipe, value: string): void => {
-    setRecipe({
-      ...recipe,
-      [field]: value
-    });
-  };
+  async function fetchRegions() {
+    const response = await getRegions();
+    if (response.error) {
+      return <h1>REGIONS NOT FOUND</h1>;
+    }
+    const data: IRegion[] = response.data;
+    setRegions(data);
+  }
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
-    e.preventDefault();
-    // Logic untuk update recipe akan masuk di sini
-    console.log("Updated recipe:", recipe);
-    console.log("Updated ingredients:", ingredients.filter(i => i.measurement.trim() || i.ingredient.trim()));
-  };
+  useEffect(() => {
+    fetchRecipe();
+    fetchRegions();
+  }, []);
 
   // Menambahkan field ingredient baru ketika field terakhir diisi
   useEffect(() => {
-    const lastIndex = ingredients.length - 1;
-    const lastIngredient = ingredients[lastIndex];
-    
+    const lastIndex = recipe.ingredients.length - 1;
+    const lastIngredient = recipe.ingredients[lastIndex] || {
+      measurement: "",
+      name: "",
+    };
+
     // Hanya tambahkan field baru jika yang terakhir sudah diisi
-    if (lastIngredient.measurement.trim() && lastIngredient.ingredient.trim()) {
+    if (lastIngredient.measurement.trim() && lastIngredient.name.trim()) {
       // Tambahkan baris baru hanya jika baris saat ini tidak kosong
-      if (ingredients.length < 2 || 
-          (ingredients[ingredients.length - 2].measurement.trim() && 
-           ingredients[ingredients.length - 2].ingredient.trim())) {
-        setIngredients([...ingredients, { measurement: "", ingredient: "" }]);
+      if (
+        recipe.ingredients.length < 2 ||
+        (recipe.ingredients[recipe.ingredients.length - 2].measurement.trim() &&
+          recipe.ingredients[recipe.ingredients.length - 2].name.trim())
+      ) {
+        setRecipe((prev) => ({
+          ...prev,
+          ingredients: [...prev.ingredients, { measurement: "", name: "" }],
+        }));
       }
     }
-    
+
     // Hapus baris kosong kecuali yang terakhir
-    const filledIngredients = ingredients.filter((item, idx) => {
+    const filledIngredients = recipe.ingredients.filter((item, idx) => {
       // Jika bukan baris terakhir, harus terisi
-      if (idx < ingredients.length - 1) {
-        return item.measurement.trim() !== "" || item.ingredient.trim() !== "";
+      if (idx < recipe.ingredients.length - 1) {
+        return item.measurement.trim() !== "" || item.name.trim() !== "";
       }
       // Selalu simpan baris terakhir
       return true;
     });
-    
+
     // Pastikan minimal ada satu baris
-    if (filledIngredients.length !== ingredients.length) {
-      setIngredients(filledIngredients);
+    if (filledIngredients.length !== recipe.ingredients.length) {
+      setRecipe((prev) => ({
+        ...prev,
+        ingredients: filledIngredients,
+      }));
     }
-  }, [ingredients]);
+  }, [recipe.ingredients]);
 
   return (
     <div className="container max-w-5xl mx-auto my-8 px-4">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Edit Recipe</h1>
-        <Link href="/recipe/1" className="inline-block text-gray-700 hover:text-red-600 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        <Link
+          href={`/recipes/${recipe.slug}`}
+          className="inline-block text-gray-700 hover:text-red-600 transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+            />
           </svg>
         </Link>
       </div>
 
-      <form className="bg-white rounded-lg shadow-md p-6" onSubmit={handleSubmit}>
+      <form className="bg-white rounded-lg shadow-md p-6">
         <div className="mb-5">
           <label
             htmlFor="name"
@@ -115,7 +129,9 @@ export default function EditRecipe() {
             id="name"
             name="name"
             value={recipe.name}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => handleRecipeChange("name", e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setRecipe({ ...recipe, name: e.target.value })
+            }
             placeholder="Enter recipe name"
           />
         </div>
@@ -125,7 +141,7 @@ export default function EditRecipe() {
             Ingredients
           </h2>
 
-          {ingredients.map((item, index) => (
+          {recipe.ingredients.map((item, index) => (
             <div
               className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
               key={index}
@@ -145,7 +161,11 @@ export default function EditRecipe() {
                   placeholder="e.g. 2 tablespoons"
                   value={item.measurement}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    handleIngredientChange(index, "measurement", e.target.value)
+                    setRecipe((prev) => {
+                      const newIngredients = [...prev.ingredients];
+                      newIngredients[index].measurement = e.target.value;
+                      return { ...prev, ingredients: newIngredients };
+                    })
                   }
                 />
               </div>
@@ -162,9 +182,13 @@ export default function EditRecipe() {
                   id={`ingredient${index + 1}`}
                   name={`ingredient${index + 1}`}
                   placeholder="e.g. Salt"
-                  value={item.ingredient}
+                  value={item.name}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    handleIngredientChange(index, "ingredient", e.target.value)
+                    setRecipe((prev) => {
+                      const newIngredients = [...prev.ingredients];
+                      newIngredients[index].name = e.target.value;
+                      return { ...prev, ingredients: newIngredients };
+                    })
                   }
                 />
               </div>
@@ -184,8 +208,10 @@ export default function EditRecipe() {
             id="instructions"
             name="instructions"
             rows={10}
-            value={recipe.instructions}
-            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => handleRecipeChange("instructions", e.target.value)}
+            value={recipe.instruction}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+              setRecipe({ ...recipe, instruction: e.target.value })
+            }
             placeholder="Enter cooking instructions (each step on a new line)"
           ></textarea>
         </div>
@@ -201,17 +227,16 @@ export default function EditRecipe() {
             className="select w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-900"
             id="RegionId"
             name="RegionId"
-            value={recipe.regionId}
-            onChange={(e: ChangeEvent<HTMLSelectElement>) => handleRecipeChange("regionId", e.target.value)}
+            value={recipe.RegionId}
+            onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+              setRecipe({ ...recipe, RegionId: e.target.value })
+            }
           >
-            <option value="" disabled>
-              ---SELECT REGION---
-            </option>
-            <option value="1">Jawa</option>
-            <option value="2">Sumatera Barat</option>
-            <option value="3">Jawa Timur</option>
-            <option value="4">Sulawesi</option>
-            <option value="5">Kalimantan</option>
+            {regions.map((region) => (
+              <option key={region._id} value={region._id}>
+                {region.name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -223,17 +248,21 @@ export default function EditRecipe() {
             >
               Recipe Image
             </label>
-            <span className="text-xs text-gray-500">Current image will be kept if no new image is uploaded</span>
+            <span className="text-xs text-gray-500">
+              Current image will be kept if no new image is uploaded
+            </span>
           </div>
-          
-          <div className="mb-3">
-            <img 
-              src="https://www.thespruceeats.com/thmb/oqvtWwIClU_gVpx8xp_Rf-JVMzQ=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/easy-chicken-cacciatore-recipe-995356-hero-01-38d6b01395b8435299ae192885ec38f9.jpg" 
-              alt="Current recipe image" 
-              className="w-full h-48 object-cover rounded-md"
-            />
-          </div>
-          
+
+          {recipe.imageUrl && (
+            <div className="mb-3">
+              <img
+                src={recipe.imageUrl}
+                alt={recipe.name}
+                className="w-full h-48 object-contain rounded-md"
+              />
+            </div>
+          )}
+
           <input
             type="file"
             className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-900"
