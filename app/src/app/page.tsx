@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { getRecipes } from "./action";
+import { getRecipes, getRegions } from "./action";
 import CardRecipe from "./components/CardRecipe";
 
 interface IRecipeData {
@@ -25,11 +25,18 @@ export interface IRecipe {
   UserId: string;
   createdAt: string;
   updatedAt: string;
+  region: string;
+  author: string;
 }
 
-interface IIngredient {
+export interface IIngredient {
   name: string;
   measurement: string;
+}
+
+export interface IRegion {
+  _id: string;
+  name: string;
 }
 
 export default function Home() {
@@ -40,19 +47,48 @@ export default function Home() {
     totalDataCount: 0,
     result: [],
   });
+  const [regions, setRegions] = useState<IRegion[]>([]);
+
+  const [search, setSearch] = useState("");
+  const [region, setRegion] = useState("");
+  const [page, setPage] = useState(1);
 
   async function fetchRecipes() {
-    const response = await getRecipes();
+    const response = await getRecipes(search, region, page);
     if (response.error) {
-      return <h1>NOT FOUND</h1>
+      return <h1>RECIPES NOT FOUND</h1>;
     }
     const data: IRecipeData = response.data;
-    setRecipes(data);
+    if (page === 1) {
+      setRecipes(data);
+    } else {
+      setRecipes((prev) => ({
+        ...prev,
+        result: [...prev.result, ...data.result],
+      }));
+    }
+  }
+
+  async function fetchRegions() {
+    const response = await getRegions();
+    if (response.error) {
+      return <h1>REGIONS NOT FOUND</h1>;
+    }
+    const data: IRegion[] = response.data;
+    setRegions(data);
   }
 
   useEffect(() => {
-    fetchRecipes();
+    fetchRegions();
   }, []);
+
+  useEffect(() => {
+    fetchRecipes();
+  }, [search, region, page]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, region]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -145,17 +181,25 @@ export default function Home() {
 
         <div className="container mx-auto mt-4 px-4">
           <div className="flex justify-center mb-8">
-            <div className="flex gap-4 items-center justify-centerw-full">
+            <div className="flex gap-4 items-center justify-center w-full">
               <input
-                className="border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 text-gray-800 w-full"
+                className="border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 text-gray-800 w-1/2"
                 type="search"
                 placeholder="Search menu"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
               />
-              <select className="select border border-gray-300 rounded-full px-4 py-[0.6rem] text-sm focus:outline-none focus:ring-2 focus:ring-red-600 text-gray-800 w-64">
-                <option>All Regions</option>
-                <option>Jawa</option>
-                <option>Sumatera Barat</option>
-                <option>Jawa Timur</option>
+              <select
+                className="select border border-gray-300 rounded-full px-4 py-[0.6rem] text-sm focus:outline-none focus:ring-2 focus:ring-red-600 text-gray-800 w-1/4"
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+              >
+                <option value={""}>All Regions</option>
+                {regions.map((region) => (
+                  <option key={region._id} value={region.name}>
+                    {region.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -169,12 +213,14 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-8">
-            <Link
-              href="/recipes"
+            <button
+              onClick={() => {
+                setPage(page + 1);
+              }}
               className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-full text-lg inline-block"
             >
               Load More
-            </Link>
+            </button>
           </div>
         </div>
       </div>

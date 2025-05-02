@@ -26,6 +26,8 @@ export default function RecipeDetail() {
     UserId: "",
     createdAt: "",
     updatedAt: "",
+    region: "",
+    author: "",
   });
   const [alternatives, setAlternatives] = useState<IAlternative[]>([]);
 
@@ -44,8 +46,8 @@ export default function RecipeDetail() {
 
   async function generateAlternatives() {
     Swal.fire({
-      title: "Generating Alternatives...",
-      text: "Please wait while we fetch alternative ingredients.",
+      title: "Generating Alternative Ingredients",
+      text: "Please wait...",
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
@@ -110,7 +112,7 @@ export default function RecipeDetail() {
 
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-800 mb-2">Region</h2>
-        <p className="text-gray-600">{recipe.RegionId}</p>
+        <p className="text-gray-600">{recipe.region}</p>
       </div>
 
       <div className="mb-8">
@@ -142,7 +144,7 @@ export default function RecipeDetail() {
               </tr>
             </thead>
             <tbody>
-              {recipe.ingredients.map((ingredient, index) => (
+              {recipe.ingredients?.map((ingredient, index) => (
                 <tr
                   key={index}
                   className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
@@ -186,7 +188,7 @@ export default function RecipeDetail() {
           Instructions
         </h2>
         <div className="space-y-3 text-gray-700">
-          {recipe.instruction.split("\n").map((line, index) => (
+          {recipe.instruction?.split("\n").map((line, index) => (
             <p key={index}>{line}</p>
           ))}
         </div>
@@ -194,7 +196,7 @@ export default function RecipeDetail() {
 
       <div className="text-center mt-10 mb-6">
         <Link
-          href={`/editrecipe/${recipe.slug}`}
+          href={`/edit-recipe/${recipe.slug}`}
           className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md inline-block"
         >
           Edit Recipe
