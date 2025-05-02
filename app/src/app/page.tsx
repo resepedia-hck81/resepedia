@@ -87,7 +87,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchRecipes();
-  }, [search, region, recipes.page]);
+  }, [recipes.page]);
 
   useEffect(() => {
     setRecipes((prev) => ({
