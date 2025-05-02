@@ -46,7 +46,7 @@ export default function RecipeDetail() {
 
   async function generateAlternatives() {
     Swal.fire({
-      title: "Generating Alternative Ingredients",
+      title: "Generating...",
       text: "Please wait...",
       allowOutsideClick: false,
       didOpen: () => {
@@ -58,7 +58,7 @@ export default function RecipeDetail() {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Failed to fetch alternative ingredients. Please try again later.",
+        text: "Failed to generate alternative ingredients. Please try again later.",
       });
       return;
     }
