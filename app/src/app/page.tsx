@@ -1,7 +1,59 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { getRecipes } from "./action";
+import CardRecipe from "./components/CardRecipe";
+
+interface IRecipeData {
+  page: number;
+  totalPages: number;
+  dataCount: number;
+  totalDataCount: number;
+  result: IRecipe[];
+}
+
+export interface IRecipe {
+  _id: string;
+  name: string;
+  slug: string;
+  imageUrl: string;
+  ingredients: IIngredient[];
+  instruction: string;
+  RegionId: string;
+  UserId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface IIngredient {
+  name: string;
+  measurement: string;
+}
 
 export default function Home() {
+  const [recipes, setRecipes] = useState<IRecipeData>({
+    page: 1,
+    totalPages: 0,
+    dataCount: 12,
+    totalDataCount: 0,
+    result: [],
+  });
+
+  async function fetchRecipes() {
+    const response = await getRecipes();
+    if (response.error) {
+      return <h1>NOT FOUND</h1>
+    }
+    const data: IRecipeData = response.data;
+    setRecipes(data);
+  }
+
+  useEffect(() => {
+    fetchRecipes();
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Carousel di bagian atas */}
@@ -84,9 +136,11 @@ export default function Home() {
       {/* Page Content */}
       <div className="py-8 px-6">
         <div className="text-center">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">Recipe List</h1>
-        </div>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-800 mb-6">
+              Recipe List
+            </h1>
+          </div>
         </div>
 
         <div className="container mx-auto mt-4 px-4">
@@ -106,142 +160,12 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Recipe Card Grid - Replacing Table */}
+          {/* Recipe Card Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {/* Recipe Card 1 */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="h-48 overflow-hidden relative">
-                <Image
-                  src="https://dcostseafood.id/wp-content/uploads/2023/04/Nasi-Goreng-Spesial.jpg"
-                  alt="Nasi Goreng"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                  Nasi Goreng
-                </h3>
-                <div className="flex justify-between mb-3">
-                  <p className="text-sm text-gray-600">Jawa</p>
-                  <p className="text-sm text-gray-600">By: Chef Juna</p>
-                </div>
-                <Link
-                  href="/recipes/1"
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm inline-block w-full text-center"
-                >
-                  View Recipe
-                </Link>
-              </div>
-            </div>
-
-            {/* Recipe Card 2 */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="h-48 overflow-hidden relative">
-                <Image
-                  src="https://cdn.idntimes.com/content-images/community/2022/04/resep-rendang-filosofi-rendang-makna-rendang-arti-rendang-rendang-dari-mana-makanan-indonesia-filosofi-9cde86371d7fc78c91ae80a6ffab250e-e0b9344da253b8e653bd42c7df03d6d9.jpg"
-                  alt="Rendang"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                  Rendang
-                </h3>
-                <div className="flex justify-between mb-3">
-                  <p className="text-sm text-gray-600">Sumatera Barat</p>
-                  <p className="text-sm text-gray-600">By: Chef Renatta</p>
-                </div>
-                <Link
-                  href="/recipe/2"
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm inline-block w-full text-center"
-                >
-                  View Recipe
-                </Link>
-              </div>
-            </div>
-
-            {/* Recipe Card 3 */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="h-48 overflow-hidden relative">
-                <Image
-                  src="https://healthybelly.s3.amazonaws.com/product/media_1738841131_0.webp"
-                  alt="Soto Ayam"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                  Soto Ayam
-                </h3>
-                <div className="flex justify-between mb-3">
-                  <p className="text-sm text-gray-600">Jawa Timur</p>
-                  <p className="text-sm text-gray-600">By: Chef Arnold</p>
-                </div>
-                <Link
-                  href="/recipe/3"
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm inline-block w-full text-center"
-                >
-                  View Recipe
-                </Link>
-              </div>
-            </div>
-
-            {/* Recipe Card 4 */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="h-48 overflow-hidden relative">
-                <Image
-                  src="https://radarlampung.bacakoran.co/upload/ae348f1bff19ec6f336caa2d03740c68.jpeg"
-                  alt="Sate Padang"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                  Sate Padang
-                </h3>
-                <div className="flex justify-between mb-3">
-                  <p className="text-sm text-gray-600">Sumatera Barat</p>
-                  <p className="text-sm text-gray-600">By: Chef Marinka</p>
-                </div>
-                <Link
-                  href="/recipe/4"
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm inline-block w-full text-center"
-                >
-                  View Recipe
-                </Link>
-              </div>
-            </div>
-
-            {/* Recipe Card 5 */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="h-48 overflow-hidden relative">
-                <Image
-                  src="https://radarlampung.bacakoran.co/upload/ae348f1bff19ec6f336caa2d03740c68.jpeg"
-                  alt="Sate Padang"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                  Sate Padang
-                </h3>
-                <div className="flex justify-between mb-3">
-                  <p className="text-sm text-gray-600">Sumatera Barat</p>
-                  <p className="text-sm text-gray-600">By: Chef Marinka</p>
-                </div>
-                <Link
-                  href="/recipe/4"
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm inline-block w-full text-center"
-                >
-                  View Recipe
-                </Link>
-              </div>
-            </div>
+            {/* Recipe Card */}
+            {recipes.result.map((recipe) => (
+              <CardRecipe key={recipe._id} recipe={recipe} />
+            ))}
           </div>
 
           <div className="text-center mt-8">

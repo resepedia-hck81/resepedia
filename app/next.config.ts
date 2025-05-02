@@ -11,7 +11,8 @@ const nextConfig = {
       'cdn.idntimes.com',
       "cdn1-production-images-kly.akamaized.net",
       "png.pngtree.com",
-      "img.pikbest.com" 
+      "img.pikbest.com",
+      "www.themealdb.com"
     ],
   },
 }
