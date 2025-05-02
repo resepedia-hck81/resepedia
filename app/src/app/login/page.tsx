@@ -44,7 +44,7 @@ export default function Login() {
           <h1 className="text-3xl font-bold text-gray-800 mb-6">
             Lets's Login!
           </h1>
-          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <form className="text-sm font-medium text-gray-800 mb-1 flex flex-col gap-4" onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="email"

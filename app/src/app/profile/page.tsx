@@ -66,9 +66,8 @@ export default function Profile() {
         <div className="bg-gray-50 p-4 rounded-lg mb-6">
           <div className="flex justify-between items-center mb-2">
             <span className="font-semibold text-black">Premium Membership</span>
-            <span className="text-xl font-bold text-black">Rp 99.000</span>
+            <span className="text-xl font-bold text-black">Rp 350.000</span>
           </div>
-          <p className="text-sm text-gray-600">Unlimited access for 30 days</p>
         </div>
         
         <div className="flex space-x-3">
