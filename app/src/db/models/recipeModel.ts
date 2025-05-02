@@ -197,7 +197,7 @@ export default class RecipeModel {
         console.log("response dari kucing :", response)
         newImageUrl = response;
       } catch (err) {
-        throw new CustomError("Failed to upload image", 500);
+        throw new CustomError("Invalid image", 401);
       }
     }
 
