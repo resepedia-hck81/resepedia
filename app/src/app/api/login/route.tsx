@@ -5,8 +5,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
 	try {
-		const { username, email, password } = await request.json();
-		const user = await User.where("email", email).orWhere("username", username).firstOrFail();
+		const { username, password } = await request.json();
+		const user = await User.where("email", username).orWhere("username", username).firstOrFail();
 		if (!(await compare(password, user.password))) return new NextResponse("Invalid username or password", { status: 401 });
 		const token = await sign({ _id: user._id, email: user.email }, true);
 		const resp = NextResponse.json({ message: "Success" }, { status: 200 });

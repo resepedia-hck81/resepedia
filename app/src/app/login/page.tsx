@@ -48,54 +48,35 @@ export default function Login() {
 				</Link>
 			</div>
 
-      {/* Left side - Login form */}
-      <div className="w-1/2 flex flex-col justify-center items-center bg-white p-10">
-        <div className="w-full max-w-md">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">
-            Lets's Login!
-          </h1>
-          <form className="text-sm font-medium text-gray-800 mb-1 flex flex-col gap-4" onSubmit={handleSubmit}>
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-800 mb-1"
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-800 mb-1"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-            <button
-              type="submit"
-              className="mt-4 bg-red-600 text-white py-3 rounded-md hover:bg-red-700 transition-colors w-full"
-            >
-              Login
-            </button>
-          </form>
-          <p className="text-center text-sm text-gray-800 mt-6">
-            Don't have any account yet?{" "}
-            <Link href="/register" className="text-red-600 hover:underline">
-              Register
-            </Link>
-          </p>
-        </div>
-      </div>
+			{/* Left side - Login form */}
+			<div className="w-1/2 flex flex-col justify-center items-center bg-white p-10">
+				<div className="w-full max-w-md">
+					<h1 className="text-3xl font-bold text-gray-800 mb-6">Lets&apos;s Login!</h1>
+					<form className="text-sm font-medium text-gray-800 mb-1 flex flex-col gap-4" onSubmit={handleSubmit}>
+						<div>
+							<label htmlFor="email" className="block text-sm font-medium text-gray-800 mb-1">
+								Email or Username
+							</label>
+							<input name="username" value={form.username} onChange={handleChange} type="email" id="email" className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" />
+						</div>
+						<div>
+							<label htmlFor="password" className="block text-sm font-medium text-gray-800 mb-1">
+								Password
+							</label>
+							<input name="password" value={form.password} onChange={handleChange} type="password" id="password" className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" />
+						</div>
+						<button type="submit" className="mt-4 bg-red-600 text-white py-3 rounded-md hover:bg-red-700 transition-colors w-full">
+							Login
+						</button>
+					</form>
+					<p className="text-center text-sm text-gray-800 mt-6">
+						Don&apos;t have any account yet?{" "}
+						<Link href="/register" className="text-red-600 hover:underline">
+							Register
+						</Link>
+					</p>
+				</div>
+			</div>
 
 			{/* Right side - Image */}
 			<div
