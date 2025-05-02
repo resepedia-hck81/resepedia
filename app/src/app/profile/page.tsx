@@ -1,11 +1,20 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import swal from "../components/Swal";
 
 export default function Profile() {
 	const router = useRouter();
+	// useEffect(async () => {
+	// 	const res = await fetch("/api/profile", {
+	// 		method: "GET",
+	// 		headers: {
+	// 			"Content-Type": "application/json",
+	// 		},
+	// 	});
+
+	// }, []);
 	const [user, setUser] = useState({
 		username: "Meimei",
 		email: "Meimei@mail.com",
