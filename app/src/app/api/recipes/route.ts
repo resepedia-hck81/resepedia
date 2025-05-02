@@ -20,8 +20,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1")
     const limit = parseInt(searchParams.get("limit") || "12")
-    const sort = searchParams.get("sort") === "asc" ? 1 : -1
-    const sortBy = searchParams.get("sortBy") === "name" ? "name" : "createdAt"
+    const sort = searchParams.get("sort") === "desc" ? -1 : 1
+    const sortBy = searchParams.get("sortBy") === "createdAt" ? "createdAt" : "name"
     const filter = searchParams.get("filter") || ""
     const search = searchParams.get("search") || ""
     const result = await RecipeModel.getRecipes({

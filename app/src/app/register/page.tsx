@@ -1,42 +1,53 @@
-'use client'
+"use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import swal from "../components/Swal";
 
 export default function Register() {
-  const router = useRouter();
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Logika register bisa ditambahkan di sini
-    
-    // Redirect ke halaman login setelah register
-    router.push("/login");
-  };
-  
-  return (
-    <div className="flex min-h-screen">
-      {/* Back arrow */}
-      <div className="absolute top-4 left-4">
-        <Link
-          href="/"
-          className="inline-block text-gray-700 hover:text-red-600 transition-colors"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-            />
-          </svg>
-        </Link>
-      </div>
+	const router = useRouter();
+	const [form, setForm] = useState({
+		email: "",
+		username: "",
+		password: "",
+	});
+
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		setForm((prev) => ({ ...prev, [name]: value }));
+	};
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		if (!form.email || !form.username || !form.password) {
+			swal.error(400, "Missing required fields");
+		}
+		try {
+			const res = await fetch("/api/register", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(form),
+			});
+			const result = await res.json();
+			if (res.ok) {
+				swal.success("Register success, please login");
+				router.push("/login");
+			} else swal.error(res.status, result.message || "Register failed");
+		} catch {
+			swal.error(500, "Network error, please try again later");
+		}
+	};
+
+	return (
+		<div className="flex min-h-screen">
+			{/* Back arrow */}
+			<div className="absolute top-4 left-4">
+				<Link href="/" className="inline-block text-gray-700 hover:text-red-600 transition-colors">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+						<path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+					</svg>
+				</Link>
+			</div>
 
       {/* Left side - Register form */}
       <div className="w-1/2 flex flex-col justify-center items-center bg-white p-10">
@@ -100,16 +111,14 @@ export default function Register() {
         </div>
       </div>
 
-      {/* Right side - Image */}
-      <div
-        className="w-1/2 bg-cover bg-center"
-        style={{
-          backgroundImage:
-            "url('https://images3.alphacoders.com/970/970431.jpg')",
-        }}
-      >
-        {/* Background image bisa diganti sesuai kebutuhan */}
-      </div>
-    </div>
-  );
+			{/* Right side - Image */}
+			<div
+				className="w-1/2 bg-cover bg-center"
+				style={{
+					backgroundImage: "url('https://images3.alphacoders.com/970/970431.jpg')",
+				}}>
+				{/* Background image bisa diganti sesuai kebutuhan */}
+			</div>
+		</div>
+	);
 }

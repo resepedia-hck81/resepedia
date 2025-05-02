@@ -12,7 +12,7 @@ export const gemini = async (prompt: string | File, schema?: object, systemInstr
 		responseSchema: schema,
 		systemInstruction: systemInstruction,
 	};
-	const model = "gemini-2.5-flash-preview-04-17";
+	const model = ""; //"gemini-2.5-flash-preview-04-17";
 	let parts: Part[];
 	if (typeof prompt === "string") {
 		parts = [{ text: prompt }];
@@ -28,9 +28,8 @@ export const gemini = async (prompt: string | File, schema?: object, systemInstr
 		}
 		console.error("No valid response text found from Gemini.");
 		return null;
-	} catch (error) {
-		console.error("Error in Gemini API call:", error);
-		return null;
+	} catch (error: unknown) {
+		throw new Error(error instanceof Error ? error.message : "Unknown error occurred during Gemini API call.");
 	}
 };
 

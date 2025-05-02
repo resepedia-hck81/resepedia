@@ -1,6 +1,8 @@
-'use client'
+"use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import swal from "../components/Swal";
 
 export default function Profile() {
   const [user, setUser] = useState({
