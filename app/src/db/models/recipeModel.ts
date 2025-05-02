@@ -155,9 +155,13 @@ export default class RecipeModel {
     ]
     try {
       const recipe = await recipes.aggregate<IRecipe>(pipeline).toArray()
-      if (!recipe) throw new CustomError("Recipe not found", 404)
-      return recipe
+      console.log("recipe", recipe)
+      if (!recipe[0]) throw new CustomError("Recipe not found", 404)
+      return recipe[0]
     } catch (error) {
+      if (error instanceof CustomError) {
+        throw error
+      }
       console.log("Error fetching recipe by ID (model):", error)
       throw new CustomError("Internal Server Error", 500)
     }
