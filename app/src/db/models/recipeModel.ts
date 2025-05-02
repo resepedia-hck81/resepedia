@@ -3,6 +3,7 @@ import { getDB } from "../config/mongodb";
 import CustomError from "../exeptions/customError";
 import { z } from "zod";
 import { generateContent } from "../helpers/gemini";
+import { Catbox } from 'node-catbox';
 
 interface IRecipe {
   name: string
@@ -185,6 +186,21 @@ export default class RecipeModel {
     const recipes = this.getCollection()
     recipeSchema.passthrough().parse(input)
     const { name, imageUrl, ingredients, instruction, RegionId, UserId } = input
+
+    let newImageUrl = imageUrl;
+    if (imageUrl) { 
+      const catbox = new Catbox(process.env.CATBOX_USER_HASH)
+      try {
+        const response = await catbox.uploadFile({
+          path: imageUrl,
+        });
+        console.log("response dari kucing :", response)
+        newImageUrl = response;
+      } catch (err) {
+        throw new CustomError("Failed to upload image", 500);
+      }
+    }
+
     const date = new Date()
     const createdAt = date.toISOString()
     const updatedAt = date.toISOString()
@@ -193,7 +209,7 @@ export default class RecipeModel {
       await recipes.insertOne({
         name,
         slug,
-        imageUrl,
+        imageUrl: newImageUrl,
         ingredients,
         instruction,
         RegionId: new ObjectId(RegionId),
