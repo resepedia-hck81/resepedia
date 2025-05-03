@@ -52,12 +52,12 @@ export default function Login() {
 			<div className="w-1/2 flex flex-col justify-center items-center bg-white p-10">
 				<div className="w-full max-w-md">
 					<h1 className="text-3xl font-bold text-gray-800 mb-6">Lets&apos;s Login!</h1>
-					<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+					<form className="text-sm font-medium text-gray-800 mb-1 flex flex-col gap-4" onSubmit={handleSubmit}>
 						<div>
 							<label htmlFor="email" className="block text-sm font-medium text-gray-800 mb-1">
 								Email or Username
 							</label>
-							<input name="username" value={form.username} onChange={handleChange} type="text" id="email" className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" />
+							<input name="username" value={form.username} onChange={handleChange} type="email" id="email" className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" />
 						</div>
 						<div>
 							<label htmlFor="password" className="block text-sm font-medium text-gray-800 mb-1">

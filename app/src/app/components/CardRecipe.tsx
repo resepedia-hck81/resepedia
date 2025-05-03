@@ -24,8 +24,8 @@ export default function CardRecipe({recipe}: IProps) {
           {recipe.name}
         </h3>
         <div className="flex justify-between mb-3">
-          <p className="text-sm text-gray-600">{recipe.RegionId}</p>
-          <p className="text-sm text-gray-600">By: {recipe.UserId}</p>
+          <p className="text-sm text-gray-600">{recipe.region}</p>
+          <p className="text-sm text-gray-600">By: {recipe.author}</p>
         </div>
         <Link
           href={`/recipes/${recipe.slug}`}

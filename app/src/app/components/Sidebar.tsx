@@ -75,7 +75,7 @@ export default function Sidebar() {
           Login
         </Link>
         <Link
-          href="/addrecipe"
+          href="/add-recipe"
           className="flex items-center gap-3 text-lg text-gray-700 hover:text-red-500 transition-colors"
         >
           <svg
@@ -112,7 +112,7 @@ export default function Sidebar() {
               d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          Let's Find You A Recipe
+          Let&apos;s Find You A Recipe
         </Link>
       </nav>
     </aside>

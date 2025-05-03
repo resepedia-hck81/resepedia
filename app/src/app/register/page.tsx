@@ -53,7 +53,7 @@ export default function Register() {
 			<div className="w-1/2 flex flex-col justify-center items-center bg-white p-10">
 				<div className="w-full max-w-md">
 					<h1 className="text-3xl font-bold text-gray-800 mb-6">Create an Account</h1>
-					<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+					<form className="text-sm font-medium text-gray-800 mb-1 flex flex-col gap-4" onSubmit={handleSubmit}>
 						<div>
 							<label htmlFor="UserName" className="block text-sm font-medium text-gray-800 mb-1">
 								User Name
