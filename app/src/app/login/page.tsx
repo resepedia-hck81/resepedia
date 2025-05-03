@@ -57,7 +57,7 @@ export default function Login() {
 							<label htmlFor="email" className="block text-sm font-medium text-gray-800 mb-1">
 								Email or Username
 							</label>
-							<input name="username" value={form.username} onChange={handleChange} type="email" id="email" className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" />
+							<input name="username" value={form.username} onChange={handleChange} type="text" id="email" className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" />
 						</div>
 						<div>
 							<label htmlFor="password" className="block text-sm font-medium text-gray-800 mb-1">
