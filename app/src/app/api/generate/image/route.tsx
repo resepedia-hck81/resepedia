@@ -1,51 +1,12 @@
 import { gemini } from "@/services/gemini";
-import { Type } from "@google/genai";
 import { NextRequest, NextResponse } from "next/server";
+import { schema } from "../schema";
 
 export const POST = async (request: NextRequest) => {
 	try {
 		const formData = await request.formData();
 		const image = formData.get("image");
 		if (!image) return new NextResponse("No image provided", { status: 400 });
-		const schema = {
-			type: Type.OBJECT,
-			required: ["recipes"],
-			properties: {
-				recipes: {
-					type: Type.ARRAY,
-					items: {
-						type: Type.OBJECT,
-						required: ["name", "ingredients", "instructions", "region"],
-						properties: {
-							name: {
-								type: Type.STRING,
-							},
-							ingredients: {
-								type: Type.ARRAY,
-								items: {
-									type: Type.OBJECT,
-									required: ["name", "measurement"],
-									properties: {
-										name: {
-											type: Type.STRING,
-										},
-										measurement: {
-											type: Type.STRING,
-										},
-									},
-								},
-							},
-							instructions: {
-								type: Type.STRING,
-							},
-							region: {
-								type: Type.STRING,
-							},
-						},
-					},
-				},
-			},
-		};
 		const systemInstruction = [
 			{
 				text: `**Objective:** Analyze a provided image of ingredients and generate exactly three unique recipe recommendations that can be made using *only* the items visible in the image. No external ingredients are allowed in the generated recipes.
@@ -62,25 +23,27 @@ export const POST = async (request: NextRequest) => {
     3.  **Output Format:** Output a JSON array containing exactly three recipe objects, adhering strictly to the following schema:
     
       \`\`\`json
-      [
         {
-          "name": "string",
-          "ingredients": [
-            {
-              "name": "string",
-              "measurement": "string"
-            }
-          ],
-          "instructions": "string",
-          "Regionid": "ObjectId string"
-        },
-        // ... two more recipe objects following the same schema ...
-      ]
+            [
+                {
+                    "name": "string",
+                    "ingredients": [
+                        {
+                        "name": "string",
+                        "measurement": "string"
+                        }
+                    ],
+                    "instructions": ["string"],
+                    "Regionid": "ObjectId string"
+                },
+                // ... two more recipe objects following the same schema ...
+            ]
+        }
       \`\`\`
     
       *   \`name\`: The name of the recipe.
       *   \`ingredients\`: An array listing the specific ingredients from the image used in this recipe, with approximate quantities and units (infer these from the image if possible, otherwise use common sense or indicate "to taste/as needed" if quantity is unclear).
-      *   \`instructions\`: A step-by-step guide on how to prepare the dish using the listed ingredients. Keep instructions relatively simple.
+      *   \`instructions\`: An array of strings. A step-by-step guide on how to prepare the dish using the listed ingredients. Keep instructions relatively simple.
       *   \`Region\`: Populate this field with \`country_region\` ex: \`INDONESIA_SURABAYA\`.
     4.  **Infer Ingredients from Image:** You must be able to identify the ingredients from the visual data in the image. If an ingredient is unidentifiable, it cannot be used in a recipe.
     5.  **Plausible Recipes:** The recipes should be reasonably plausible and edible combinations of the identified ingredients.

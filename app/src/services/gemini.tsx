@@ -12,7 +12,7 @@ export const gemini = async (prompt: string | File, schema?: object, systemInstr
 		responseSchema: schema,
 		systemInstruction: systemInstruction,
 	};
-	const model = ""; //"gemini-2.5-flash-preview-04-17";
+	const model = "gemini-2.5-flash-preview-04-17";
 	let parts: Part[];
 	if (typeof prompt === "string") {
 		parts = [{ text: prompt }];
