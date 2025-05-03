@@ -9,7 +9,7 @@ export const POST = async (request: NextRequest) => {
 		if (!image) return new NextResponse("No image provided", { status: 400 });
 		const schema = {
 			type: Type.OBJECT,
-			required: ["recipes"],
+			required: ["recipes", "ingredients"],
 			properties: {
 				recipes: {
 					type: Type.ARRAY,
@@ -36,12 +36,21 @@ export const POST = async (request: NextRequest) => {
 								},
 							},
 							instructions: {
-								type: Type.STRING,
+								type: Type.ARRAY,
+								items: {
+									type: Type.STRING,
+								},
 							},
 							region: {
 								type: Type.STRING,
 							},
 						},
+					},
+				},
+				ingredients: {
+					type: Type.ARRAY,
+					items: {
+						type: Type.STRING,
 					},
 				},
 			},
@@ -62,25 +71,27 @@ export const POST = async (request: NextRequest) => {
     3.  **Output Format:** Output a JSON array containing exactly three recipe objects, adhering strictly to the following schema:
     
       \`\`\`json
-      [
         {
-          "name": "string",
-          "ingredients": [
-            {
-              "name": "string",
-              "measurement": "string"
-            }
-          ],
-          "instructions": "string",
-          "Regionid": "ObjectId string"
-        },
-        // ... two more recipe objects following the same schema ...
-      ]
+            [
+                {
+                    "name": "string",
+                    "ingredients": [
+                        {
+                        "name": "string",
+                        "measurement": "string"
+                        }
+                    ],
+                    "instructions": ["string"],
+                    "Regionid": "ObjectId string"
+                },
+                // ... two more recipe objects following the same schema ...
+            ]
+        }
       \`\`\`
     
       *   \`name\`: The name of the recipe.
       *   \`ingredients\`: An array listing the specific ingredients from the image used in this recipe, with approximate quantities and units (infer these from the image if possible, otherwise use common sense or indicate "to taste/as needed" if quantity is unclear).
-      *   \`instructions\`: A step-by-step guide on how to prepare the dish using the listed ingredients. Keep instructions relatively simple.
+      *   \`instructions\`: An array of strings. A step-by-step guide on how to prepare the dish using the listed ingredients. Keep instructions relatively simple.
       *   \`Region\`: Populate this field with \`country_region\` ex: \`INDONESIA_SURABAYA\`.
     4.  **Infer Ingredients from Image:** You must be able to identify the ingredients from the visual data in the image. If an ingredient is unidentifiable, it cannot be used in a recipe.
     5.  **Plausible Recipes:** The recipes should be reasonably plausible and edible combinations of the identified ingredients.

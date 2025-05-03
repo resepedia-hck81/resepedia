@@ -25,7 +25,7 @@ export default function Profile() {
 	const handleLogout = async () => {
 		const res = await (await fetch("/api/logout", { method: "POST" })).json();
 		if (res.ok) {
-			swal.success("Logout success", "You have been logged out successfully");
+			swal.success("You have been logged out successfully");
 			router.push("/login");
 		} else {
 			swal.error(500, "Logout failed");
