@@ -3,10 +3,12 @@ import Link from "next/link";
 import { useState, useEffect, ChangeEvent } from "react";
 import { IIngredient, IRegion } from "../page";
 import { getRegions } from "../action";
+import { uploadToCatbox } from "./action";
+import Swal from "sweetalert2";
 
 interface IRecipeInput {
   name: string;
-  imageUrl: string;
+  imageUrl: File | null;
   ingredients: IIngredient[];
   instruction: string;
   RegionId: string;
@@ -15,14 +17,12 @@ interface IRecipeInput {
 export default function AddRecipe() {
   const [recipe, setRecipe] = useState<IRecipeInput>({
     name: "",
-    imageUrl: "",
+    imageUrl: null,
     ingredients: [{ measurement: "", name: "" }],
     instruction: "",
     RegionId: "",
   });
   const [regions, setRegions] = useState<IRegion[]>([]);
-
-  console.log(recipe);
 
   async function fetchRegions() {
     const response = await getRegions();
@@ -31,6 +31,46 @@ export default function AddRecipe() {
     }
     const data: IRegion[] = response.data;
     setRegions(data);
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // catbox upload
+    let newImageUrl = ""
+    const formData = new FormData();
+    if (recipe.imageUrl) {
+      formData.append("file", recipe.imageUrl); 
+    };
+    formData.append("name", formData.get("name") as string);
+    try {
+      const result = await uploadToCatbox(formData);
+      newImageUrl = result.url
+    } catch (err: any) {
+      console.error("Error uploading image:", err.message); 
+    }
+
+    // call api add-recipe
+    try {
+      const result = await fetch("/api/recipes", {
+        method: "POST",
+        body: JSON.stringify({
+          ...recipe,
+          imageUrl: newImageUrl,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      await result.json();
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Recipe added successfully!",
+      })
+    } catch (err) {
+      console.error("Error adding recipe:", err);
+    }
   }
 
   useEffect(() => {
@@ -83,7 +123,7 @@ export default function AddRecipe() {
     <div className="container max-w-5xl mx-auto my-8 px-4">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Add Recipe</h1>
 
-      <form className="bg-white rounded-lg shadow-md p-6">
+      <form className="bg-white rounded-lg shadow-md p-6" onSubmit={(e) => handleSubmit(e)}>
         <div className="mb-5">
           <label
             htmlFor="name"
@@ -221,6 +261,11 @@ export default function AddRecipe() {
             id="file"
             name="file"
             accept="image/*"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              if (e.target.files && e.target.files[0]) {
+                setRecipe({ ...recipe, imageUrl: e.target.files[0] });
+              }
+            }}
           />
         </div>
         <div className="flex items-center justify-between">
