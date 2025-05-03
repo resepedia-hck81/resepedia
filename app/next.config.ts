@@ -12,7 +12,8 @@ const nextConfig = {
       "cdn1-production-images-kly.akamaized.net",
       "png.pngtree.com",
       "img.pikbest.com",
-      "www.themealdb.com"
+      "www.themealdb.com",
+      "files.catbox.moe"
     ],
   },
 }

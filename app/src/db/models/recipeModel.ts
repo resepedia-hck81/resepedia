@@ -187,19 +187,19 @@ export default class RecipeModel {
     recipeSchema.passthrough().parse(input)
     const { name, imageUrl, ingredients, instruction, RegionId, UserId } = input
 
-    let newImageUrl = imageUrl;
-    if (imageUrl) { 
-      const catbox = new Catbox(process.env.CATBOX_USER_HASH)
-      try {
-        const response = await catbox.uploadFile({
-          path: imageUrl,
-        });
-        console.log("response dari kucing :", response)
-        newImageUrl = response;
-      } catch (err) {
-        throw new CustomError("Invalid image", 401);
-      }
-    }
+    // let newImageUrl = imageUrl
+    // if (imageUrl) { 
+    //   const catbox = new Catbox(process.env.CATBOX_USER_HASH)
+    //   try {
+    //     const response = await catbox.uploadFile({
+    //       path: imageUrl,
+    //     });
+    //     console.log("response dari kucing :", response)
+    //     newImageUrl = response
+    //   } catch (err) {
+    //     throw new CustomError("Invalid image", 401)
+    //   }
+    // }
 
     const date = new Date()
     const createdAt = date.toISOString()
@@ -209,7 +209,7 @@ export default class RecipeModel {
       await recipes.insertOne({
         name,
         slug,
-        imageUrl: newImageUrl,
+        imageUrl,
         ingredients,
         instruction,
         RegionId: new ObjectId(RegionId),
@@ -228,6 +228,21 @@ export default class RecipeModel {
     const recipes = this.getCollection()
     recipeSchema.passthrough().parse(input)
     const { name, imageUrl, ingredients, instruction, RegionId, UserId } = input
+
+    let newImageUrl = imageUrl
+    if (imageUrl) { 
+      const catbox = new Catbox(process.env.CATBOX_USER_HASH)
+      try {
+        const response = await catbox.uploadFile({
+          path: imageUrl,
+        })
+        console.log("response dari kucing :", response)
+        newImageUrl = response
+      } catch (err) {
+        throw new CustomError("Invalid image", 401)
+      }
+    }
+
     const date = new Date()
     const updatedAt = date.toISOString()
     try {
