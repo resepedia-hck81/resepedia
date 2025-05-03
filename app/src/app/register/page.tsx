@@ -56,7 +56,7 @@ export default function Register() {
 					<form className="text-sm font-medium text-gray-800 mb-1 flex flex-col gap-4" onSubmit={handleSubmit}>
 						<div>
 							<label htmlFor="UserName" className="block text-sm font-medium text-gray-800 mb-1">
-								User Name
+								Username
 							</label>
 							<input name="username" value={form.username} onChange={handleChange} type="text" id="UserName" className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" />
 						</div>
