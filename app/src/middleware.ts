@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (request.nextUrl.pathname.startsWith("/api")) {
-    if (request.nextUrl.pathname.startsWith("/api/recipes")) {
+    if (request.nextUrl.pathname.startsWith("/api/recipes") || request.nextUrl.pathname.startsWith("/api/profile")) {
       const token = await findCookies()
       if (!token) return
       return authentication(token)
