@@ -49,7 +49,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
 
-    const body: IInput = await request.json()
+    let body: IInput
+    try {
+      body = await request.json();
+    } catch (err) {
+      console.error("Error parsing JSON body:", err);
+      return NextResponse.json({ message: "Invalid JSON body" }, { status: 400 });
+    }
+
     const { name, imageUrl, ingredients, instruction } = body
     if (!name) {
       return NextResponse.json({ message: "Name is required" }, { status: 400 })

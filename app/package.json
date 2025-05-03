@@ -21,6 +21,7 @@
     "mongoloquent": "^3.0.2",
     "multer": "^1.4.5-lts.2",
     "next": "15.3.1",
+    "node-catbox": "^3.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-infinite-scroll-component": "^6.1.0",

@@ -1,31 +1,54 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import swal from "../components/Swal";
+import Swal from "sweetalert2";
+import { getProfile } from "./action";
 
 export default function Profile() {
 	const router = useRouter();
+
 	const [user, setUser] = useState({
-		username: "Meimei",
-		email: "Meimei@mail.com",
+		username: "",
+		email: "",
 		isPremium: false,
-		tokenCount: 4,
+		tokenCount: 7,
 	});
 
 	const [showPremiumModal, setShowPremiumModal] = useState(false);
 
 	const totalTokens = 7;
 
-	const openPremiumModal = (e) => {
-		e.preventDefault();
+	async function fetchProfile() {
+		const response = await getProfile();
+		if (response.error) {
+			Swal.fire({
+				icon: "error",
+				title: "Error",
+				text: response.message,
+			});
+			return router.push("/login");
+		}		
+		setUser(response.data);
+	}
+	useEffect(() => {
+		fetchProfile();
+	}, [])
+
+	const openPremiumModal = () => {
 		setShowPremiumModal(true);
 	};
 
 	const handleLogout = async () => {
 		const res = await (await fetch("/api/logout", { method: "POST" })).json();
 		if (res.ok) {
-			swal.success("You have been logged out successfully");
+			Swal.fire({
+				icon: "success",
+				title: "Success",
+				text: "You have been logged out successfully",
+			});
+
 			router.push("/login");
 		} else {
 			swal.error(500, "Logout failed");
