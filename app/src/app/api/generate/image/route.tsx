@@ -1,60 +1,12 @@
 import { gemini } from "@/services/gemini";
-import { Type } from "@google/genai";
 import { NextRequest, NextResponse } from "next/server";
+import { schema } from "../schema";
 
 export const POST = async (request: NextRequest) => {
 	try {
 		const formData = await request.formData();
 		const image = formData.get("image");
 		if (!image) return new NextResponse("No image provided", { status: 400 });
-		const schema = {
-			type: Type.OBJECT,
-			required: ["recipes", "ingredients"],
-			properties: {
-				recipes: {
-					type: Type.ARRAY,
-					items: {
-						type: Type.OBJECT,
-						required: ["name", "ingredients", "instructions", "region"],
-						properties: {
-							name: {
-								type: Type.STRING,
-							},
-							ingredients: {
-								type: Type.ARRAY,
-								items: {
-									type: Type.OBJECT,
-									required: ["name", "measurement"],
-									properties: {
-										name: {
-											type: Type.STRING,
-										},
-										measurement: {
-											type: Type.STRING,
-										},
-									},
-								},
-							},
-							instructions: {
-								type: Type.ARRAY,
-								items: {
-									type: Type.STRING,
-								},
-							},
-							region: {
-								type: Type.STRING,
-							},
-						},
-					},
-				},
-				ingredients: {
-					type: Type.ARRAY,
-					items: {
-						type: Type.STRING,
-					},
-				},
-			},
-		};
 		const systemInstruction = [
 			{
 				text: `**Objective:** Analyze a provided image of ingredients and generate exactly three unique recipe recommendations that can be made using *only* the items visible in the image. No external ingredients are allowed in the generated recipes.
