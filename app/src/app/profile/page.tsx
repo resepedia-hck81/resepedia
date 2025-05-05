@@ -15,6 +15,15 @@ interface IUser {
   tokenCount: number;
 }
 
+// Interface untuk resep yang ditampilkan di tabel
+interface IRecipe {
+  _id: string;
+  name: string;
+  slug: string;
+  region: string;
+  createdAt: string;
+}
+
 export default function Profile() {
     const router = useRouter();
 
@@ -26,6 +35,10 @@ export default function Profile() {
         isPremium: false,
         tokenCount: 7,
     });
+
+    // State untuk menyimpan resep user
+    const [userRecipes, setUserRecipes] = useState<IRecipe[]>([]);
+    const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
 
     const [showPremiumModal, setShowPremiumModal] = useState(false);
     const [paymentStatus, setPaymentStatus] = useState("none"); // none, pending, paid, failed
@@ -43,6 +56,30 @@ export default function Profile() {
             return router.push("/login");
         }        
         setUser(response.data);
+    }
+
+    async function fetchUserRecipes() {
+        if (!user._id) return;
+        
+        setIsLoadingRecipes(true);
+        try {
+            const response = await fetch(`/api/recipes/user`, {
+                headers: {
+                    'x-user-id': user._id,
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                setUserRecipes(data.result || []);
+            } else {
+                console.error("Failed to fetch user recipes");
+            }
+        } catch (error) {
+            console.error("Error fetching user recipes:", error);
+        } finally {
+            setIsLoadingRecipes(false);
+        }
     }
 
     async function fetchPendingOrders() {
@@ -77,9 +114,12 @@ export default function Profile() {
     }, []);
 
     useEffect(() => {
-        // Setelah profile diambil, cek apakah ada order pending
-        if (user._id && !user.isPremium) {
-            fetchPendingOrders();
+        // Setelah profile diambil, cek apakah ada order pending dan ambil resep user
+        if (user._id) {
+            if (!user.isPremium) {
+                fetchPendingOrders();
+            }
+            fetchUserRecipes();
         }
     }, [user._id, user.isPremium]);
 
@@ -175,6 +215,62 @@ export default function Profile() {
         }
     };
 
+    const handleDeleteRecipe = async (slug: string) => {
+        try {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    // Show loading
+                    Swal.fire({
+                        title: 'Deleting...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    const response = await fetch(`/api/recipes/${slug}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'x-user-id': user._id || '',
+                        }
+                    });
+
+                    if (response.ok) {
+                        Swal.fire(
+                            'Deleted!',
+                            'Your recipe has been deleted.',
+                            'success'
+                        );
+                        // Refresh recipes list
+                        fetchUserRecipes();
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.message || 'Failed to delete recipe');
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error deleting recipe:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error instanceof Error ? error.message : 'Failed to delete recipe',
+            });
+        }
+    };
+
+    const handleEditRecipe = (slug: string) => {
+        router.push(`/edit-recipe/${slug}`);
+    };
+
     return (
         <div className="container max-w-5xl mx-auto py-8 px-4">
             {/* Premium Modal */}
@@ -229,13 +325,6 @@ export default function Profile() {
                 </div>
             )}
 
-            <div className="mb-4">
-                <Link href="/" className="inline-block text-gray-700 hover:text-red-600 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                    </svg>
-                </Link>
-            </div>
 
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 {/* Profile Header */}
@@ -332,6 +421,95 @@ export default function Profile() {
                                     <p className="text-xs text-gray-500 mt-1">
                                         {user.tokenCount} of {totalTokens} tokens available
                                     </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* My Recipes Section */}
+                    <div className="mb-8">
+					<div className="flex justify-between items-center mb-4">
+    <h2 className="text-xl font-semibold text-gray-800">My Recipes</h2>
+</div>
+                        
+                        <div className="bg-white overflow-hidden border border-gray-200 rounded-lg">
+                            {isLoadingRecipes ? (
+                                <div className="p-8 text-center">
+                                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-red-600 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+                                    <p className="mt-4 text-gray-600">Loading your recipes...</p>
+                                </div>
+                            ) : userRecipes.length === 0 ? (
+                                <div className="p-8 text-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 mx-auto text-gray-400 mb-3">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <h3 className="text-lg font-semibold text-gray-700 mb-1">No recipes yet</h3>
+                                    <p className="text-gray-500 mb-4">Start by adding your first recipe</p>
+                                    <Link href="/add-recipe" className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm inline-block transition-colors">
+                                        Add Recipe
+                                    </Link>
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="bg-gray-50">
+                                            <tr>
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    No
+                                                </th>
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Name
+                                                </th>
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Region
+                                                </th>
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Actions
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-200">
+                                            {userRecipes.map((recipe, index) => (
+                                                <tr key={recipe._id} className="hover:bg-gray-50">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        {index + 1}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <Link href={`/recipes/${recipe.slug}`} className="text-sm font-medium text-gray-900 hover:text-red-600 transition-colors">
+                                                            {recipe.name}
+                                                        </Link>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                            {recipe.region}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                        <div className="flex gap-2">
+                                                            <button 
+                                                                onClick={() => handleEditRecipe(recipe.slug)}
+                                                                className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 p-1.5 rounded-md"
+                                                                title="Edit Recipe"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                                                </svg>
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => handleDeleteRecipe(recipe.slug)}
+                                                                className="text-red-600 hover:text-red-900 bg-red-50 p-1.5 rounded-md"
+                                                                title="Delete Recipe"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
                             )}
                         </div>
