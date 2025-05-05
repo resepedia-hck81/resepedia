@@ -47,12 +47,18 @@ export default function AddRecipe() {
       const result = await uploadToCatbox(formData);
       newImageUrl = result.url
     } catch (err: any) {
-      console.error("Error uploading image:", err.message); 
+      console.error("Error uploading image:", err.message)
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to upload image",
+      })
+      return
     }
 
     // call api add-recipe
     try {
-      const result = await fetch("/api/recipes", {
+      const response = await fetch("/api/recipes", {
         method: "POST",
         body: JSON.stringify({
           ...recipe,
@@ -62,7 +68,11 @@ export default function AddRecipe() {
           "Content-Type": "application/json",
         },
       });
-      await result.json();
+      const result = await response.json();
+      if (!result.ok) {
+        console.error("result :", result);
+        throw new Error(result.message || "Failed to add recipe")
+      }
       Swal.fire({
         icon: "success",
         title: "Success",
@@ -70,6 +80,13 @@ export default function AddRecipe() {
       })
     } catch (err) {
       console.error("Error adding recipe:", err);
+      if (err instanceof Error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: err.message,
+        })
+      }
     }
   }
 

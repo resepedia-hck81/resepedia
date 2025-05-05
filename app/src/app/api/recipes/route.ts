@@ -1,6 +1,7 @@
 import CustomError from "@/db/exeptions/customError";
 import RecipeModel from "@/db/models/recipeModel";
 import { NextRequest, NextResponse } from "next/server";
+import { ZodError } from "zod";
 
 export interface IInput {
   name: string
@@ -50,14 +51,9 @@ export async function POST(request: NextRequest) {
     }
 
     let body: IInput
-    try {
-      body = await request.json();
-    } catch (err) {
-      console.error("Error parsing JSON body:", err);
-      return NextResponse.json({ message: "Invalid JSON body" }, { status: 400 });
-    }
-
+    body = await request.json();
     const { name, imageUrl, ingredients, instruction } = body
+
     if (!name) {
       return NextResponse.json({ message: "Name is required" }, { status: 400 })
     }
@@ -67,18 +63,30 @@ export async function POST(request: NextRequest) {
     if (ingredients.length < 1) {
       return NextResponse.json({ message: "At least put 1 ingredient" }, { status: 400 })
     }
+    let newIngredients = ingredients
+      .filter((ingredient) => ingredient.name || ingredient.measurement)
+      .map((ingredient) => {
+        if (!ingredient.name || !ingredient.measurement) {
+          throw new Error("Ingredient name and measurement are required");
+        }
+        return ingredient; 
+      });
+    console.log("newIngredients =====> ", newIngredients)
     if (!instruction) {
-      return NextResponse.json({ message: "Instruction is required" }, { status: 400 })
+      return NextResponse.json({ message: "Instruction is required" }, { status: 400 });
     }
-    
     // call regionid, then validate
 
-    const message = await RecipeModel.addRecipe({...body, UserId: _id})
+    const message = await RecipeModel.addRecipe({...body, UserId: _id, ingredients: newIngredients})
     return NextResponse.json(message, { status: 201 })
   } catch (err) {
     console.log("Error adding recipe (API):", err)
     if (err instanceof CustomError) {
       return NextResponse.json({ message: err.message }, { status: err.status })
+    } else if (err instanceof ZodError) {
+      return NextResponse.json({ message: err.issues[0].message }, { status: 400 })
+    } else if (err instanceof Error) {
+      return NextResponse.json({ message: err.message }, { status: 400 })
     }
     return NextResponse.json({ message: "ISE" }, { status: 500 })
   }
