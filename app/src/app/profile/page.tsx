@@ -302,7 +302,9 @@ export default function Profile() {
                     <div>
                         <p className="text-sm text-gray-700">
                             Showing
-                            <span className="font-medium">{` ${pageDetail.dataCount} `}</span>
+                            <span className="font-medium">{` ${(pageNumber - 1) * 10 + 1} `}</span>
+                            to
+                            <span className="font-medium">{` ${(pageNumber - 1) * 10 + pageDetail.dataCount} `}</span>
                             of
                             <span className="font-medium">{` ${pageDetail.totalDataCount} `}</span>
                             recipes
