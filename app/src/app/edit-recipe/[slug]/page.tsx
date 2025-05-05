@@ -28,7 +28,7 @@ export default function EditRecipe() {
   });
   const [oldImageUrl, setOldImageUrl] = useState<string>("");
   const [regions, setRegions] = useState<IRegion[]>([]);
-  
+
   async function fetchRecipe() {
     const response = await getRecipeBySlug(slug);
     if (response.error) {
@@ -59,29 +59,51 @@ export default function EditRecipe() {
 
   const handleChange = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const errors = [];
+    if (!recipe.name) errors.push("Name is required");
+    if (recipe.ingredients.length < 2) {
+      errors.push("At least one ingredient is required");
+    } else {
+      recipe.ingredients
+        .filter((ingredient) => ingredient.name || ingredient.measurement)
+        .forEach((ingredient) => {
+          if (!ingredient.name || !ingredient.measurement) {
+            errors.push("Both ingredient name and measurement are required");
+          }
+        });
+    }
+    if (!recipe.instruction) errors.push("Instruction is required");
+    if (!recipe.RegionId) errors.push("Region is required");
+    if (errors.length) {
+      return Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errors.join(", "),
+      });
+    }
+
     // to change => name, imageUrl, ingredients, instruction, RegionId
     // catbox if imageUrl is not null
-    let newImageUrl = ""
+    let newImageUrl = "";
     if (recipe.imageUrl) {
       const formData = new FormData();
       if (recipe.imageUrl) {
-        formData.append("file", recipe.imageUrl); 
-      };
+        formData.append("file", recipe.imageUrl);
+      }
       formData.append("name", formData.get("name") as string);
       try {
         const result = await uploadToCatbox(formData);
-        newImageUrl = result.url
-      } catch (err: any) {
-        console.error("Error uploading image:", err.message); 
+        newImageUrl = result.url;
+      } catch {
         Swal.fire({
           icon: "error",
           title: "Error",
           text: "Failed to upload image",
-        })
-        return
+        });
+        return;
       }
     } else {
-      newImageUrl = oldImageUrl
+      newImageUrl = oldImageUrl;
     }
 
     try {
@@ -97,13 +119,13 @@ export default function EditRecipe() {
       });
       if (!response.ok) {
         const result = await response.json();
-        throw new Error(result.message || "Failed to edit recipe")
+        throw new Error(result.message || "Failed to edit recipe");
       }
       Swal.fire({
         icon: "success",
         title: "Success",
         text: "Recipe edited successfully!",
-      })
+      });
     } catch (err) {
       console.error("Error editing recipe:", err);
       if (err instanceof Error) {
@@ -111,10 +133,10 @@ export default function EditRecipe() {
           icon: "error",
           title: "Error",
           text: err.message,
-        })
+        });
       }
     }
-  }
+  };
 
   useEffect(() => {
     fetchRecipe();
@@ -188,7 +210,10 @@ export default function EditRecipe() {
         </Link>
       </div>
 
-      <form className="bg-white rounded-lg shadow-md p-6" onSubmit={(e) => handleChange(e)}>
+      <form
+        className="bg-white rounded-lg shadow-md p-6"
+        onSubmit={(e) => handleChange(e)}
+      >
         <div className="mb-5">
           <label
             htmlFor="name"
@@ -325,17 +350,14 @@ export default function EditRecipe() {
               Current image will be kept if no new image is uploaded
             </span>
           </div>
-
-          {recipe.imageUrl && (
-            <div className="mb-3">
-              <img
-                src={oldImageUrl}
-                alt={recipe.name}
-                className="w-full h-48 object-contain rounded-md"
-              />
-            </div>
-          )}
-
+          ={" "}
+          <div className="mb-3">
+            <img
+              src={oldImageUrl}
+              alt={recipe.name}
+              className="w-full h-48 object-contain rounded-md"
+            />
+          </div>
           <input
             type="file"
             className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-900"
