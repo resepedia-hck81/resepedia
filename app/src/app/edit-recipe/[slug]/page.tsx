@@ -4,7 +4,7 @@ import { IIngredient, IRecipe, IRegion } from "@/app/page";
 import { getRecipeBySlug } from "@/app/recipes/[slug]/action";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useState, useEffect, ChangeEvent, use } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { uploadToCatbox } from "./action";
 import Swal from "sweetalert2";
 

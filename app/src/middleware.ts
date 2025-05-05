@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
 	}
 
 	async function authentication(token: RequestCookie) {
-		const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET as string);
+		const secret = new TextEncoder().encode(process.env.JWT_SECRET as string);
 		const { payload } = await jose.jwtVerify<{ _id: ObjectId; email: string }>(token.value, secret);
 		if (!payload._id || !payload.email) return new Response("Unauthorized", { status: 401 });
 		const requestHeaders = new Headers(request.headers);

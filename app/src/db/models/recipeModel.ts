@@ -3,7 +3,6 @@ import { getDB } from "../config/mongodb";
 import CustomError from "../exeptions/customError";
 import { z } from "zod";
 import { generateContent } from "../helpers/gemini";
-import { Catbox } from 'node-catbox';
 
 interface IRecipe {
   name: string
