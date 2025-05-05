@@ -6,7 +6,7 @@ import { GoogleGenAI, Part } from "@google/genai";
 // import mime from "mime";
 
 export const gemini = async (prompt: string | File, schema?: object, systemInstruction?: object) => {
-	const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API });
+	const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 	const config = {
 		responseMimeType: "application/json",
 		responseSchema: schema,
