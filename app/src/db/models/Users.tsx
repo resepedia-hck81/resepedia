@@ -1,4 +1,5 @@
 import { Model, IMongoloquentSchema, IMongoloquentTimestamps } from "mongoloquent";
+import CustomError from "../exeptions/customError";
 
 interface IUser extends IMongoloquentSchema, IMongoloquentTimestamps {
 	email: string;
@@ -22,4 +23,11 @@ export default class User extends Model<IUser> {
 	 * @var string
 	 */
 	static $collection: string = "users";
+
+	async payToken() {
+		if (this.isPremium) return;
+		if (this.tokenCount === 0) throw new CustomError("No tokens left", 400);
+		this.tokenCount--;
+		await this.save();
+	}
 }
