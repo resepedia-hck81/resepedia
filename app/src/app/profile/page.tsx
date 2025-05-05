@@ -259,8 +259,11 @@ export default function Profile() {
                             'Your recipe has been deleted.',
                             'success'
                         );
-                        // Refresh recipes list
-                        fetchUserRecipes();
+                        if (userRecipes.length === 1) {
+                            setPageNumber((prev) => Math.max(prev - 1, 1));
+                        } else {
+                            fetchUserRecipes();
+                        }
                     } else {
                         const error = await response.json();
                         throw new Error(error.message || 'Failed to delete recipe');
