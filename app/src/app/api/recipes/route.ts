@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     console.log("Error fetching recipes (API):", err)
     if (err instanceof CustomError) {
-      return NextResponse.json({ message: err.message }, { status: err.status })
+      return NextResponse.json({ message: err.message }, { status: err.status as number })
     }
     return NextResponse.json({ message: "ISE" }, { status: 500 })
   }
@@ -52,8 +52,7 @@ export async function POST(request: NextRequest) {
     if (!_id) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
-    let body: IInput
-    body = await request.json();
+    const body: IInput = await request.json();
     const { name, imageUrl, ingredients, instruction, RegionId } = body
     if (!name) {
       return NextResponse.json({ message: "Name is required" }, { status: 400 })
@@ -64,7 +63,7 @@ export async function POST(request: NextRequest) {
     if (ingredients.length < 1) {
       return NextResponse.json({ message: "At least put 1 ingredient" }, { status: 400 })
     }
-    let newIngredients = ingredients
+    const newIngredients = ingredients
       .filter((ingredient) => ingredient.name || ingredient.measurement)
       .map((ingredient) => {
         if (!ingredient.name || !ingredient.measurement) {
@@ -84,7 +83,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.log("Error adding recipe (API):", err)
     if (err instanceof CustomError) {
-      return NextResponse.json({ message: err.message }, { status: err.status })
+      return NextResponse.json({ message: err.message }, { status: err.status as number })
     } else if (err instanceof ZodError) {
       return NextResponse.json({ message: err.issues[0].message }, { status: 400 })
     } else if (err instanceof Error) {

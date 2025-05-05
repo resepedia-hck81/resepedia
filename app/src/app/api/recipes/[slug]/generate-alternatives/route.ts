@@ -16,7 +16,7 @@ export async function GET(request: NextRequest, Props: IProps) {
     if (err instanceof CustomError) {
       return NextResponse.json(
         { message: err.message },
-        { status: err.status }
+        { status: err.status as number}
       );
     }
     return NextResponse.json(
