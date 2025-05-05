@@ -23,6 +23,7 @@ export async function GET(request: NextRequest, Props: IProps) {
 
 export async function PUT(request: NextRequest, Props: IProps) {
   try {
+    console.log("lewat sini ")
     const _id = request.headers.get("x-user-id")
     if (!_id) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
@@ -42,6 +43,7 @@ export async function PUT(request: NextRequest, Props: IProps) {
     if (!instruction) {
       return NextResponse.json({ message: "Instruction is required" }, { status: 400 })
     }
+    console.log("body >>>>>>> ", body)
     const recipe = await RecipeModel.updateRecipeBySlug(slug, {...body, UserId: _id})
     return NextResponse.json(recipe, { status: 200 })
   } catch (err) {

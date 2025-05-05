@@ -170,7 +170,6 @@ export default class RecipeModel {
     ]
     try {
       const recipe = await recipes.aggregate<IRecipe>(pipeline).toArray()
-      console.log("recipe", recipe)
       if (!recipe[0]) throw new CustomError("Recipe not found", 404)
       return recipe[0]
     } catch (error) {
@@ -186,22 +185,6 @@ export default class RecipeModel {
     const recipes = this.getCollection()
     recipeSchema.passthrough().parse(input)
     const { name, imageUrl, ingredients, instruction, RegionId, UserId } = input
-
-    // let newImageUrl = imageUrl
-    // if (imageUrl) { 
-    //   const catbox = new Catbox(process.env.CATBOX_USER_HASH)
-    //   try {
-    //     const response = await catbox.uploadFile({
-    //       path: imageUrl,
-    //     });
-    //     console.log("response dari kucing :", response)
-    //     newImageUrl = response
-    //   } catch (err) {
-    //     console.error("Error uploading to Catbox:", err);
-    //     throw new CustomError("Failed to upload image", 500);
-    //   }
-    // }
-
     const date = new Date()
     const createdAt = date.toISOString()
     const updatedAt = date.toISOString()
@@ -229,21 +212,6 @@ export default class RecipeModel {
     const recipes = this.getCollection()
     recipeSchema.passthrough().parse(input)
     const { name, imageUrl, ingredients, instruction, RegionId, UserId } = input
-
-    let newImageUrl = imageUrl
-    if (imageUrl) { 
-      const catbox = new Catbox(process.env.CATBOX_USER_HASH)
-      try {
-        const response = await catbox.uploadFile({
-          path: imageUrl,
-        })
-        console.log("response dari kucing :", response)
-        newImageUrl = response
-      } catch (err) {
-        throw new CustomError("Invalid image", 401)
-      }
-    }
-
     const date = new Date()
     const updatedAt = date.toISOString()
     try {

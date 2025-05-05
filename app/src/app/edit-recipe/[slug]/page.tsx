@@ -1,37 +1,51 @@
 "use client";
 import { getRegions } from "@/app/action";
-import { IRecipe, IRegion } from "@/app/page";
+import { IIngredient, IRecipe, IRegion } from "@/app/page";
 import { getRecipeBySlug } from "@/app/recipes/[slug]/action";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent, use } from "react";
+import { uploadToCatbox } from "./action";
+import Swal from "sweetalert2";
+
+interface IRecipeInput {
+  name: string;
+  imageUrl: File | null;
+  ingredients: IIngredient[];
+  instruction: string;
+  RegionId: string;
+}
 
 export default function EditRecipe() {
   const { slug } = useParams<{ slug: string }>();
 
-  const [recipe, setRecipe] = useState<IRecipe>({
-    _id: "",
+  const [recipe, setRecipe] = useState<IRecipeInput>({
     name: "",
-    slug: "",
-    imageUrl: "",
-    ingredients: [],
+    imageUrl: null,
+    ingredients: [{ measurement: "", name: "" }],
     instruction: "",
     RegionId: "",
-    UserId: "",
-    createdAt: "",
-    updatedAt: "",
-    region: "",
-    author: "",
   });
+  const [oldImageUrl, setOldImageUrl] = useState<string>("");
   const [regions, setRegions] = useState<IRegion[]>([]);
-
+  
   async function fetchRecipe() {
     const response = await getRecipeBySlug(slug);
     if (response.error) {
       return <h1>NOT FOUND</h1>;
     }
     const data: IRecipe = response.data;
-    setRecipe(data);
+    setOldImageUrl(data.imageUrl);
+    setRecipe({
+      name: data.name,
+      imageUrl: null,
+      ingredients: data.ingredients.map((item) => ({
+        measurement: item.measurement,
+        name: item.name,
+      })),
+      instruction: data.instruction,
+      RegionId: data.RegionId,
+    });
   }
 
   async function fetchRegions() {
@@ -41,6 +55,49 @@ export default function EditRecipe() {
     }
     const data: IRegion[] = response.data;
     setRegions(data);
+  }
+
+  const handleChange = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // to change => name, imageUrl, ingredients, instruction, RegionId
+    // catbox if imageUrl is not null
+    let newImageUrl = ""
+    if (recipe.imageUrl) {
+      const formData = new FormData();
+      if (recipe.imageUrl) {
+        formData.append("file", recipe.imageUrl); 
+      };
+      formData.append("name", formData.get("name") as string);
+      try {
+        const result = await uploadToCatbox(formData);
+        newImageUrl = result.url
+      } catch (err: any) {
+        console.error("Error uploading image:", err.message); 
+      }
+    } else {
+      newImageUrl = oldImageUrl
+    }
+
+    try {
+      const result = await fetch("/api/recipes/" + slug, {
+        method: "PUT",
+        body: JSON.stringify({
+          ...recipe,
+          imageUrl: newImageUrl,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      await result.json();
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Recipe added successfully!",
+      })
+    } catch (err) {
+      console.error("Error adding recipe:", err);
+    }
   }
 
   useEffect(() => {
@@ -95,7 +152,7 @@ export default function EditRecipe() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Edit Recipe</h1>
         <Link
-          href={`/recipes/${recipe.slug}`}
+          href={`/recipes/${slug}`}
           className="inline-block text-gray-700 hover:text-red-600 transition-colors"
         >
           <svg
@@ -115,7 +172,7 @@ export default function EditRecipe() {
         </Link>
       </div>
 
-      <form className="bg-white rounded-lg shadow-md p-6">
+      <form className="bg-white rounded-lg shadow-md p-6" onSubmit={(e) => handleChange(e)}>
         <div className="mb-5">
           <label
             htmlFor="name"
@@ -256,7 +313,7 @@ export default function EditRecipe() {
           {recipe.imageUrl && (
             <div className="mb-3">
               <img
-                src={recipe.imageUrl}
+                src={oldImageUrl}
                 alt={recipe.name}
                 className="w-full h-48 object-contain rounded-md"
               />
@@ -269,6 +326,11 @@ export default function EditRecipe() {
             id="file"
             name="file"
             accept="image/*"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              if (e.target.files && e.target.files[0]) {
+                setRecipe({ ...recipe, imageUrl: e.target.files[0] });
+              }
+            }}
           />
         </div>
 
