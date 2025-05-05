@@ -215,6 +215,9 @@ export default class RecipeModel {
     const date = new Date()
     const updatedAt = date.toISOString()
     try {
+      const existingRecipe = await recipes.findOne({ slug })
+      if (!existingRecipe) throw new CustomError("Recipe not found", 404)
+      if (existingRecipe.UserId.toString() !== UserId) throw new CustomError("Forbidden", 403)
       await recipes.updateOne(
         { slug },
         {
@@ -232,7 +235,10 @@ export default class RecipeModel {
       return "Recipe updated successfully"
     } catch (error) {
       console.log("Error updating recipe (model):", error)
-      return new CustomError("Internal Server Error", 500)
+      if (error instanceof CustomError) {
+        throw new CustomError(error.message, error.status)
+      }
+      throw new CustomError("Internal Server Error", 500)
     }
   }
 

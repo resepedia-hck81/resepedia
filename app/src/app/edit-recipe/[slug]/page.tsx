@@ -90,13 +90,24 @@ export default function EditRecipe() {
         },
       });
       await result.json();
+      console.log("result", result);
+      if (!result.ok) {
+        throw new Error(result.statusText);
+      }
       Swal.fire({
         icon: "success",
         title: "Success",
         text: "Recipe added successfully!",
       })
     } catch (err) {
-      console.error("Error adding recipe:", err);
+      console.error("Error editing recipe:", err);
+      if (err instanceof Error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: err.message,
+        })
+      }
     }
   }
 
