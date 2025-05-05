@@ -333,19 +333,29 @@ export default function Profile() {
                                 />
                             </svg>
                             </button>
-                            {Array.from({ length: pageDetail.totalPage }, (_, index) => (
-                                <button
-                                key={index + 1}
-                                onClick={() => setPageNumber(index + 1)}
-                                className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                                    pageNumber === index + 1
-                                    ? "bg-indigo-600 text-white"
-                                    : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                                }`}
-                                >
-                                {index + 1}
-                                </button>
-                            ))}
+                            {Array.from({ length: pageDetail.totalPage }, (_, index) => {
+                                if (index === 0 || index === pageDetail.totalPage - 1 || (pageNumber >= index - 1 && pageNumber <= index + 3)) {
+                                    return (
+                                        <button
+                                            key={index + 1}
+                                            onClick={() => setPageNumber(index + 1)}
+                                            className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
+                                                pageNumber === index + 1
+                                                ? "bg-indigo-600 text-white"
+                                                : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                            }`}
+                                        >
+                                            {index + 1}
+                                        </button>
+                                    )
+                                } else if (pageNumber == index - 2 || pageNumber == index + 4) {
+                                    return (
+                                        <span key={index + 1} className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                            ...
+                                        </span>
+                                    )
+                                }
+                            })}
                             <button
                             type="button"
                             onClick={() => setPageNumber((prev) => prev + 1)}
