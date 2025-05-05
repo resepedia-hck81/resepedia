@@ -5,12 +5,12 @@ import Link from "next/link";
 import { IRecipe } from "../page";
 
 interface IProps {
-  recipe: IRecipe
+  recipe: IRecipe;
 }
 
-export default function CardRecipe({recipe}: IProps) {
+export default function CardRecipe({ recipe }: IProps) {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
       <div className="h-48 overflow-hidden relative">
         <Image
           src={recipe.imageUrl}
@@ -19,13 +19,15 @@ export default function CardRecipe({recipe}: IProps) {
           className="object-cover"
         />
       </div>
-      <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-800 mb-1">
-          {recipe.name}
-        </h3>
-        <div className="flex justify-between mb-3">
-          <p className="text-sm text-gray-600">{recipe.region}</p>
-          <p className="text-sm text-gray-600">By: {recipe.author}</p>
+      <div className="p-4 flex flex-col justify-between flex-grow">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-1">
+            {recipe.name}
+          </h3>
+          <div className="flex justify-between mb-3">
+            <p className="text-sm text-gray-600">{recipe.region}</p>
+            <p className="text-sm text-gray-600">By: {recipe.author}</p>
+          </div>
         </div>
         <Link
           href={`/recipes/${recipe.slug}`}
