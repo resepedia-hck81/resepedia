@@ -49,16 +49,15 @@ export default function Home() {
     result: [],
   });
 
-  console.log(recipes);
-
   const [regions, setRegions] = useState<IRegion[]>([]);
-
   const [search, setSearch] = useState("");
   const [region, setRegion] = useState("");
+  const [loading, setLoading] = useState(true);
 
   async function fetchRecipes() {
     const response = await getRecipes(search, region, recipes.page);
     if (response.error) {
+      setLoading(false);
       return <h1>RECIPES NOT FOUND</h1>;
     }
     const data: IRecipeData = response.data;
@@ -70,15 +69,19 @@ export default function Home() {
         result: [...prev.result, ...data.result],
       }));
     }
+    setLoading(false);
   }
 
   async function fetchRegions() {
+    setLoading(true);
     const response = await getRegions();
     if (response.error) {
+      setLoading(false);
       return <h1>REGIONS NOT FOUND</h1>;
     }
     const data: IRegion[] = response.data;
     setRegions(data);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -212,23 +215,35 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Recipe Card Grid */}
-          <InfiniteScroll
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-            dataLength={recipes.result.length}
-            next={() =>
-              setRecipes((prev) => ({ ...prev, page: prev.page + 1 }))
-            }
-            hasMore={recipes.page < recipes.totalPages}
-            loader={
+          {/* Loading Indicator */}
+          {loading && (
+            <div className="flex justify-center">
               <span className="loading loading-bars loading-lg text-red-600"></span>
-            }
-            scrollThreshold={0.9}
-          >
-            {recipes.result.map((recipe) => (
-              <CardRecipe key={recipe._id} recipe={recipe} />
-            ))}
-          </InfiniteScroll>
+            </div>
+          )}
+
+          {/* Recipe Card Grid */}
+          {!loading && (
+            <InfiniteScroll
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+              dataLength={recipes.result.length}
+              next={() =>
+                setRecipes((prev) => ({ ...prev, page: prev.page + 1 }))
+              }
+              hasMore={recipes.page < recipes.totalPages}
+              loader={null}
+              scrollThreshold={0.9}
+            >
+              {recipes.result.map((recipe) => (
+                <CardRecipe key={recipe._id} recipe={recipe} />
+              ))}
+            </InfiniteScroll>
+          )}
+          {recipes.page < recipes.totalPages && (
+            <div className="w-full flex justify-center mt-6">
+              <span className="loading loading-bars loading-lg text-red-600"></span>
+            </div>
+          )}
         </div>
       </div>
     </div>

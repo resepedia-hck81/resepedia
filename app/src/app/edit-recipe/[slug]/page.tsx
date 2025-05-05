@@ -93,13 +93,23 @@ export default function EditRecipe() {
       }
       formData.append("name", formData.get("name") as string);
       try {
+        Swal.fire({
+          title: "Uploading...",
+          text: "Please wait while the image is being uploaded.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
         const result = await uploadToCatbox(formData);
         newImageUrl = result.url;
+        Swal.close();
       } catch {
+        Swal.close();
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "Failed to upload image",
+          text: "Failed to upload image, please try again later.",
         });
         return;
       }
@@ -127,7 +137,7 @@ export default function EditRecipe() {
         title: "Success",
         text: "Recipe edited successfully!",
       });
-      router.push("/profile")
+      router.push("/profile");
     } catch (err) {
       console.error("Error editing recipe:", err);
       if (err instanceof Error) {
