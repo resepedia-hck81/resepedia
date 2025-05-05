@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import swal from "./Swal";
 import GenerateResult from "./GenerateResult";
 import { ObjectId } from "mongodb";
+import CustomError from "@/db/exeptions/customError";
 
 interface Recipe {
 	id: ObjectId;
@@ -69,14 +70,15 @@ export default function GenerateByImage() {
 				method: "POST",
 				body: formData,
 			});
-			if (!res.ok) throw new Error("Failed to analyze image");
 			const data = await res.json();
+			if (!res.ok) throw new CustomError(data.message, res.status);
 			if (!data?.ingredients?.length) swal.error("No ingredients detected", "Please try again with a clearer image.");
 			setDetectedIngredients(data.ingredients || []);
 			setRecommendedRecipes(data.recipes || []);
 			setShowAnalysisResult(true);
 			setActiveRecipeTab(0);
-		} catch {
+		} catch (e: unknown) {
+			if (e instanceof CustomError) return swal.error(e.status, e.message);
 			swal.error("Failed to analyze image", "An error occurred while processing your request.");
 		} finally {
 			setLoading(false);

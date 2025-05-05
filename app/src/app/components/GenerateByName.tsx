@@ -2,6 +2,7 @@ import { useState } from "react";
 import swal from "./Swal";
 import GenerateResult from "./GenerateResult";
 import { ObjectId } from "mongodb";
+import CustomError from "@/db/exeptions/customError";
 
 interface Recipe {
 	id: ObjectId;
@@ -28,15 +29,14 @@ export default function GenerateByName() {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ name: searchQuery }),
 			});
-			if (!res.ok) throw new Error("Failed to search");
 			const data = await res.json();
-			console.log(data);
-
+			if (!res.ok) throw new CustomError(data.message, res.status);
 			setSearchResults(data.recipes || []);
 			setShowSearchResult(true);
 			setActiveSearchRecipeTab(0);
-		} catch {
-			swal.error("Error", "Failed to search for recipes. Please try again.");
+		} catch (e: unknown) {
+			if (e instanceof CustomError) return swal.error(e.status, e.message);
+			swal.error("Failed to search", "An error occurred while processing your request.");
 		} finally {
 			setLoading(false);
 		}

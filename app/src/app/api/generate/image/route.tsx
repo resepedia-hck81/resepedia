@@ -1,12 +1,14 @@
 import { gemini } from "@/services/gemini";
 import { NextRequest, NextResponse } from "next/server";
 import { schema } from "../schema";
+import User from "@/db/models/Users";
+import CustomError from "@/db/exeptions/customError";
 
 export const POST = async (request: NextRequest) => {
 	try {
 		const formData = await request.formData();
 		const image = formData.get("image");
-		if (!image) return new NextResponse("No image provided", { status: 400 });
+		if (!image) throw new CustomError("No image provided", 400);
 		const systemInstruction = [
 			{
 				text: `**Objective:** Analyze a provided image of ingredients and generate exactly three unique recipe recommendations that can be made using *only* the items visible in the image. No external ingredients are allowed in the generated recipes.
@@ -14,7 +16,6 @@ export const POST = async (request: NextRequest) => {
     **Input:**
     
     1.  **\`image_of_ingredients\`**: (Image Input) An image file containing a collection of food ingredients.
-    2.  **\`user_region_id\`**: (String) The ObjectId string representing the user's geographical region. This will be included in the output \`recipes\` schema.
     
     **Output Rules:**
     
@@ -34,7 +35,7 @@ export const POST = async (request: NextRequest) => {
                         }
                     ],
                     "instructions": ["string"],
-                    "Regionid": "ObjectId string"
+                    "Region": "string"
                 },
                 // ... two more recipe objects following the same schema ...
             ]
@@ -44,18 +45,22 @@ export const POST = async (request: NextRequest) => {
       *   \`name\`: The name of the recipe.
       *   \`ingredients\`: An array listing the specific ingredients from the image used in this recipe, with approximate quantities and units (infer these from the image if possible, otherwise use common sense or indicate "to taste/as needed" if quantity is unclear).
       *   \`instructions\`: An array of strings. A step-by-step guide on how to prepare the dish using the listed ingredients. Keep instructions relatively simple.
-      *   \`Region\`: Populate this field with \`country_region\` ex: \`INDONESIA_SURABAYA\`.
+      *   \`Region\`: Populate this field with \`region, country\` format.  Ensure that it must be a valid region, ex: \`Surabaya, Indonesia\`.
     4.  **Infer Ingredients from Image:** You must be able to identify the ingredients from the visual data in the image. If an ingredient is unidentifiable, it cannot be used in a recipe.
     5.  **Plausible Recipes:** The recipes should be reasonably plausible and edible combinations of the identified ingredients.
     6.  **Handle Limited Ingredients:** If the image contains very few or incompatible ingredients, generate the best possible (even simple) recommendations based on what *is* present. If no recipes are possible, return an empty array \`[]\` and potentially a brief note outside the JSON (though the primary output must be the JSON).`,
 			},
 		];
+		const user = await User.findOrFail(request.headers.get("x-user-id") as string);
 		const result = await gemini(image, schema, systemInstruction);
+		if (!result?.ingredients?.length) throw new CustomError("Please try again with a clearer image.", "No ingredients detected");
+		await user.payToken();
 		return NextResponse.json(result, { status: 200 });
 	} catch (error: unknown) {
 		console.error("Error in POST request:", error);
-		if (error instanceof TypeError) return new NextResponse(error.message);
-		if (error instanceof Error) return new NextResponse(error.message, { status: 500 });
-		return new NextResponse("Internal Server Error", { status: 500 });
+		if (error instanceof TypeError) return NextResponse.json({ message: error.message });
+		if (error instanceof CustomError) return NextResponse.json({ message: error.message }, { status: error.status as number });
+		// if (error instanceof Error) return NextResponse.json({ message: error.message }, { status: 500 });
+		return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
 	}
 };
