@@ -36,8 +36,15 @@ export default function Profile() {
         tokenCount: 7,
     });
 
+    const [pageDetail, setPageDetail] = useState({
+        totalPage: 0,
+        dataCount: 0,
+        totalDataCount: 0,
+    })
+
     // State untuk menyimpan resep user
     const [userRecipes, setUserRecipes] = useState<IRecipe[]>([]);
+    const [pageNumber, setPageNumber] = useState(1);
     const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
 
     const [showPremiumModal, setShowPremiumModal] = useState(false);
@@ -63,15 +70,15 @@ export default function Profile() {
         
         setIsLoadingRecipes(true);
         try {
-            const response = await fetch(`/api/recipes/user`, {
-                headers: {
-                    'x-user-id': user._id,
-                }
-            });
-            
+            const response = await fetch(`/api/recipes/?profilePage=true&limit=10&page=${pageNumber}`);
             if (response.ok) {
                 const data = await response.json();
                 setUserRecipes(data.result || []);
+                setPageDetail({
+                    totalPage: data.totalPages,
+                    dataCount: data.dataCount,
+                    totalDataCount: data.totalDataCount,
+                })
             } else {
                 console.error("Failed to fetch user recipes");
             }
@@ -112,6 +119,12 @@ export default function Profile() {
     useEffect(() => {
         fetchProfile();
     }, []);
+
+    useEffect(() => {
+        if (user._id) {
+            fetchUserRecipes();
+        }
+    }, [pageNumber])
 
     useEffect(() => {
         // Setelah profile diambil, cek apakah ada order pending dan ambil resep user
@@ -238,9 +251,6 @@ export default function Profile() {
 
                     const response = await fetch(`/api/recipes/${slug}`, {
                         method: 'DELETE',
-                        headers: {
-                            'x-user-id': user._id || '',
-                        }
                     });
 
                     if (response.ok) {
@@ -270,6 +280,98 @@ export default function Profile() {
     const handleEditRecipe = (slug: string) => {
         router.push(`/edit-recipe/${slug}`);
     };
+
+    const paginateRecipes = () => {
+        return (
+            <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+                <div className="flex flex-1 justify-between sm:hidden">
+                    <a
+                    href="#"
+                    className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                    Previous
+                    </a>
+                    <a
+                    href="#"
+                    className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                    Next
+                    </a>
+                </div>
+                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                    <div>
+                        <p className="text-sm text-gray-700">
+                            Showing
+                            <span className="font-medium">{` ${pageDetail.dataCount} `}</span>
+                            of
+                            <span className="font-medium">{` ${pageDetail.totalDataCount} `}</span>
+                            recipes
+                        </p>
+                    </div>
+                    <div>
+                        <nav
+                            className="isolate inline-flex -space-x-px rounded-md shadow-xs"
+                            aria-label="Pagination"
+                        >
+                            <button
+                            type="button"
+                            onClick={() => setPageNumber((prev) => Math.max(prev - 1, 1))}
+                            className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                            >
+                            <span className="sr-only">Previous</span>
+                            <svg
+                                className="size-5"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                aria-hidden="true"
+                                data-slot="icon"
+                            >
+                                <path
+                                fillRule="evenodd"
+                                d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"
+                                clipRule="evenodd"
+                                />
+                            </svg>
+                            </button>
+                            {Array.from({ length: pageDetail.totalPage }, (_, index) => (
+                                <button
+                                key={index + 1}
+                                onClick={() => setPageNumber(index + 1)}
+                                className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
+                                    pageNumber === index + 1
+                                    ? "bg-indigo-600 text-white"
+                                    : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                }`}
+                                >
+                                {index + 1}
+                                </button>
+                            ))}
+                            <button
+                            type="button"
+                            onClick={() => setPageNumber((prev) => prev + 1)}
+                            className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                            >
+                            <span className="sr-only">Next</span>
+                            <svg
+                                className="size-5"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                aria-hidden="true"
+                                data-slot="icon"
+                            >
+                                <path
+                                fillRule="evenodd"
+                                d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
+                                clipRule="evenodd"
+                                />
+                            </svg>
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="container max-w-5xl mx-auto py-8 px-4">
@@ -429,8 +531,8 @@ export default function Profile() {
                     {/* My Recipes Section */}
                     <div className="mb-8">
 					<div className="flex justify-between items-center mb-4">
-    <h2 className="text-xl font-semibold text-gray-800">My Recipes</h2>
-</div>
+                        <h2 className="text-xl font-semibold text-gray-800">My Recipes</h2>
+                    </div>
                         
                         <div className="bg-white overflow-hidden border border-gray-200 rounded-lg">
                             {isLoadingRecipes ? (
@@ -472,7 +574,7 @@ export default function Profile() {
                                             {userRecipes.map((recipe, index) => (
                                                 <tr key={recipe._id} className="hover:bg-gray-50">
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        {index + 1}
+                                                        {(pageNumber - 1) * 10 + index + 1}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <Link href={`/recipes/${recipe.slug}`} className="text-sm font-medium text-gray-900 hover:text-red-600 transition-colors">
@@ -512,6 +614,7 @@ export default function Profile() {
                                     </table>
                                 </div>
                             )}
+                            {paginateRecipes()}
                         </div>
                     </div>
 

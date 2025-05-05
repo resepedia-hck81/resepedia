@@ -250,7 +250,6 @@ export default class RecipeModel {
     const recipes = this.getCollection()
     try {
       const result = await recipes.deleteOne({ slug, UserId: new ObjectId(UserId) })
-      console.log("result", result); // need validate
       if (result.deletedCount === 0) throw new CustomError("Forbidden", 403)
       return "Recipe deleted successfully"
     } catch (error) {
