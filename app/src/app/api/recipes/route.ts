@@ -1,5 +1,6 @@
 import CustomError from "@/db/exeptions/customError";
 import RecipeModel from "@/db/models/recipeModel";
+import RegionModel from "@/db/models/RegionModel";
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
 
@@ -49,11 +50,9 @@ export async function POST(request: NextRequest) {
     if (!_id) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
-
     let body: IInput
     body = await request.json();
-    const { name, imageUrl, ingredients, instruction } = body
-
+    const { name, imageUrl, ingredients, instruction, RegionId } = body
     if (!name) {
       return NextResponse.json({ message: "Name is required" }, { status: 400 })
     }
@@ -67,16 +66,17 @@ export async function POST(request: NextRequest) {
       .filter((ingredient) => ingredient.name || ingredient.measurement)
       .map((ingredient) => {
         if (!ingredient.name || !ingredient.measurement) {
-          throw new Error("Ingredient name and measurement are required");
+          throw new Error("Both ingredient name and measurement are required");
         }
         return ingredient; 
       });
-    console.log("newIngredients =====> ", newIngredients)
     if (!instruction) {
       return NextResponse.json({ message: "Instruction is required" }, { status: 400 });
     }
-    // call regionid, then validate
-
+    const region = await RegionModel.getRegionById(RegionId)
+    if (!region) {
+      return NextResponse.json({ message: "Region not found" }, { status: 400 })
+    }
     const message = await RecipeModel.addRecipe({...body, UserId: _id, ingredients: newIngredients})
     return NextResponse.json(message, { status: 201 })
   } catch (err) {

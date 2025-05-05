@@ -56,7 +56,6 @@ export default function AddRecipe() {
       return
     }
 
-    // call api add-recipe
     try {
       const response = await fetch("/api/recipes", {
         method: "POST",
@@ -68,9 +67,8 @@ export default function AddRecipe() {
           "Content-Type": "application/json",
         },
       });
-      const result = await response.json();
-      if (!result.ok) {
-        console.error("result :", result);
+      if (!response.ok) {
+        const result = await response.json();
         throw new Error(result.message || "Failed to add recipe")
       }
       Swal.fire({

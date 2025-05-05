@@ -2,6 +2,8 @@ import CustomError from "@/db/exeptions/customError"
 import RecipeModel from "@/db/models/recipeModel"
 import { NextRequest, NextResponse } from "next/server"
 import { IInput } from "../route"
+import RegionModel from "@/db/models/RegionModel"
+import { ZodError } from "zod"
 
 interface IProps {
   params: Promise<{ slug: string }>
@@ -29,7 +31,7 @@ export async function PUT(request: NextRequest, Props: IProps) {
     }
     const { slug } = await Props.params
     const body: IInput = await request.json()
-    const { name, imageUrl, ingredients, instruction } = body
+    const { name, imageUrl, ingredients, instruction, RegionId } = body
     if (!name) {
       return NextResponse.json({ message: "Name is required" }, { status: 400 })
     }
@@ -39,15 +41,31 @@ export async function PUT(request: NextRequest, Props: IProps) {
     if (ingredients.length < 1) {
       return NextResponse.json({ message: "Ingredients are required" }, { status: 400 })
     }
+    let newIngredients = ingredients
+      .filter((ingredient) => ingredient.name || ingredient.measurement)
+      .map((ingredient) => {
+        if (!ingredient.name || !ingredient.measurement) {
+          throw new Error("Both ingredient name and measurement are required");
+        }
+        return ingredient; 
+      });
     if (!instruction) {
       return NextResponse.json({ message: "Instruction is required" }, { status: 400 })
     }
-    const recipe = await RecipeModel.updateRecipeBySlug(slug, {...body, UserId: _id})
-    return NextResponse.json(recipe, { status: 200 })
+    const region = await RegionModel.getRegionById(RegionId)
+    if (!region) {
+      return NextResponse.json({ message: "Region not found" }, { status: 400 })
+    }
+    const message = await RecipeModel.updateRecipeBySlug(slug, {...body, UserId: _id, ingredients: newIngredients})
+    return NextResponse.json(message, { status: 200 })
   } catch (err) {
     console.log("Error updating recipe (API):", err)
     if (err instanceof CustomError) {
       return NextResponse.json({ message: err.message }, { status: err.status })
+    } else if (err instanceof ZodError) {
+      return NextResponse.json({ message: err.issues[0].message }, { status: 400 })
+    } else if (err instanceof Error) {
+      return NextResponse.json({ message: err.message }, { status: 400 })
     }
     return NextResponse.json({ message: "ISE" }, { status: 500 })
   }

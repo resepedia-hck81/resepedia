@@ -73,13 +73,19 @@ export default function EditRecipe() {
         newImageUrl = result.url
       } catch (err: any) {
         console.error("Error uploading image:", err.message); 
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to upload image",
+        })
+        return
       }
     } else {
       newImageUrl = oldImageUrl
     }
 
     try {
-      const result = await fetch("/api/recipes/" + slug, {
+      const response = await fetch("/api/recipes/" + slug, {
         method: "PUT",
         body: JSON.stringify({
           ...recipe,
@@ -89,15 +95,14 @@ export default function EditRecipe() {
           "Content-Type": "application/json",
         },
       });
-      await result.json();
-      console.log("result", result);
-      if (!result.ok) {
-        throw new Error(result.statusText);
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.message || "Failed to edit recipe")
       }
       Swal.fire({
         icon: "success",
         title: "Success",
-        text: "Recipe added successfully!",
+        text: "Recipe edited successfully!",
       })
     } catch (err) {
       console.error("Error editing recipe:", err);
