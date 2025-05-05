@@ -170,7 +170,6 @@ export default class RecipeModel {
     ]
     try {
       const recipe = await recipes.aggregate<IRecipe>(pipeline).toArray()
-      console.log("recipe", recipe)
       if (!recipe[0]) throw new CustomError("Recipe not found", 404)
       return recipe[0]
     } catch (error) {
@@ -186,21 +185,6 @@ export default class RecipeModel {
     const recipes = this.getCollection()
     recipeSchema.passthrough().parse(input)
     const { name, imageUrl, ingredients, instruction, RegionId, UserId } = input
-
-    // let newImageUrl = imageUrl
-    // if (imageUrl) { 
-    //   const catbox = new Catbox(process.env.CATBOX_USER_HASH)
-    //   try {
-    //     const response = await catbox.uploadFile({
-    //       path: imageUrl,
-    //     });
-    //     console.log("response dari kucing :", response)
-    //     newImageUrl = response
-    //   } catch (err) {
-    //     throw new CustomError("Invalid image", 401)
-    //   }
-    // }
-
     const date = new Date()
     const createdAt = date.toISOString()
     const updatedAt = date.toISOString()
@@ -228,24 +212,12 @@ export default class RecipeModel {
     const recipes = this.getCollection()
     recipeSchema.passthrough().parse(input)
     const { name, imageUrl, ingredients, instruction, RegionId, UserId } = input
-
-    let newImageUrl = imageUrl
-    if (imageUrl) { 
-      const catbox = new Catbox(process.env.CATBOX_USER_HASH)
-      try {
-        const response = await catbox.uploadFile({
-          path: imageUrl,
-        })
-        console.log("response dari kucing :", response)
-        newImageUrl = response
-      } catch (err) {
-        throw new CustomError("Invalid image", 401)
-      }
-    }
-
     const date = new Date()
     const updatedAt = date.toISOString()
     try {
+      const existingRecipe = await recipes.findOne({ slug })
+      if (!existingRecipe) throw new CustomError("Recipe not found", 404)
+      if (existingRecipe.UserId.toString() !== UserId) throw new CustomError("Forbidden", 403)
       await recipes.updateOne(
         { slug },
         {
@@ -263,7 +235,10 @@ export default class RecipeModel {
       return "Recipe updated successfully"
     } catch (error) {
       console.log("Error updating recipe (model):", error)
-      return new CustomError("Internal Server Error", 500)
+      if (error instanceof CustomError) {
+        throw new CustomError(error.message, error.status)
+      }
+      throw new CustomError("Internal Server Error", 500)
     }
   }
 
