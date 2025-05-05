@@ -193,15 +193,6 @@ export default function RecipeDetail() {
           ))}
         </div>
       </div>
-
-      <div className="text-center mt-10 mb-6">
-        <Link
-          href={`/edit-recipe/${recipe.slug}`}
-          className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md inline-block"
-        >
-          Edit Recipe
-        </Link>
-      </div>
     </div>
   );
 }

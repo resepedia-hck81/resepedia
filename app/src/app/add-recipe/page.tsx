@@ -53,6 +53,29 @@ export default function AddRecipe() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const errors = [];
+    if (!recipe.name) errors.push("Name is required");
+    if (recipe.ingredients.length < 2) {
+      errors.push("At least one ingredient is required");
+    } else {
+      recipe.ingredients
+      .filter((ingredient) => ingredient.name || ingredient.measurement)
+      .forEach((ingredient) => {
+        if (!ingredient.name || !ingredient.measurement) {
+          errors.push("Both ingredient name and measurement are required");
+        }
+      });
+    }
+    if (!recipe.instruction) errors.push("Instruction is required");
+    if (!recipe.RegionId) errors.push("Region is required");
+    if (!recipe.imageUrl) errors.push("Image is required");
+    if (errors.length) {
+      return Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errors.join(", "),
+      });
+    }
 
     // catbox upload
     let newImageUrl = "";
