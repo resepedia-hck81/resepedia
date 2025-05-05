@@ -7,7 +7,7 @@ export const POST = async (request: NextRequest) => {
 		const { email, username, password } = await request.json();
 		if (!email || !username || !password) throw NextResponse.json({ message: "Missing required fields" }, { status: 400 });
 		const exists = await User.where("email", email).orWhere("username", username).first();
-		if (exists) throw NextResponse.json({ message: "Email or username already exists" }, { status: 409 });
+		if (exists) throw NextResponse.json({ message: "Email or username already exists" }, { status: 400 });
 
 		const hashedPassword = await hash(password);
 		await User.create({

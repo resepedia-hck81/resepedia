@@ -19,8 +19,12 @@ export default function Register() {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!form.email || !form.username || !form.password) {
-			swal.error(400, "Missing required fields");
+		const errors = [];
+		if (!form.username) errors.push("Username is required");
+		if (!form.email) errors.push("Email is required");
+		if (!form.password) errors.push("Password is required");
+		if (errors.length) {
+			return swal.error(400, errors.join(", "));
 		}
 		try {
 			const res = await fetch("/api/register", {

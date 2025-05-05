@@ -2,9 +2,10 @@
 import Link from "next/link";
 import { useState, useEffect, ChangeEvent } from "react";
 import { IIngredient, IRegion } from "../page";
-import { getRegions } from "../action";
+import { checkToken, getRegions } from "../action";
 import { uploadToCatbox } from "./action";
 import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 interface IRecipeInput {
   name: string;
@@ -24,6 +25,23 @@ export default function AddRecipe() {
   });
   const [regions, setRegions] = useState<IRegion[]>([]);
 
+  const router = useRouter();
+
+  async function checkLoginStatus() {
+    const hasToken = await checkToken();
+    if (!hasToken) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Unauthorized",
+      });
+      router.push("/login");
+    }
+  }
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+
   async function fetchRegions() {
     const response = await getRegions();
     if (response.error) {
@@ -37,23 +55,22 @@ export default function AddRecipe() {
     e.preventDefault();
 
     // catbox upload
-    let newImageUrl = ""
+    let newImageUrl = "";
     const formData = new FormData();
     if (recipe.imageUrl) {
-      formData.append("file", recipe.imageUrl); 
-    };
+      formData.append("file", recipe.imageUrl);
+    }
     formData.append("name", formData.get("name") as string);
     try {
       const result = await uploadToCatbox(formData);
-      newImageUrl = result.url
-    } catch (err: any) {
-      console.error("Error uploading image:", err.message)
+      newImageUrl = result.url;
+    } catch {
       Swal.fire({
         icon: "error",
         title: "Error",
         text: "Failed to upload image",
-      })
-      return
+      });
+      return;
     }
 
     try {
@@ -69,13 +86,13 @@ export default function AddRecipe() {
       });
       if (!response.ok) {
         const result = await response.json();
-        throw new Error(result.message || "Failed to add recipe")
+        throw new Error(result.message || "Failed to add recipe");
       }
       Swal.fire({
         icon: "success",
         title: "Success",
         text: "Recipe added successfully!",
-      })
+      });
     } catch (err) {
       console.error("Error adding recipe:", err);
       if (err instanceof Error) {
@@ -83,10 +100,10 @@ export default function AddRecipe() {
           icon: "error",
           title: "Error",
           text: err.message,
-        })
+        });
       }
     }
-  }
+  };
 
   useEffect(() => {
     fetchRegions();
@@ -138,7 +155,10 @@ export default function AddRecipe() {
     <div className="container max-w-5xl mx-auto my-8 px-4">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Add Recipe</h1>
 
-      <form className="bg-white rounded-lg shadow-md p-6" onSubmit={(e) => handleSubmit(e)}>
+      <form
+        className="bg-white rounded-lg shadow-md p-6"
+        onSubmit={(e) => handleSubmit(e)}
+      >
         <div className="mb-5">
           <label
             htmlFor="name"
