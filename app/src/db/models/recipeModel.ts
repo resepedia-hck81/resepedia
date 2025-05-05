@@ -38,6 +38,7 @@ interface IProductParam {
   sortBy: string
   filter: string
   search: string
+  UserId: string | null
 }
 
 const recipeSchema = z.object({
@@ -61,7 +62,10 @@ export default class RecipeModel {
   static async getRecipes(params: IProductParam) {
     const recipes = this.getCollection()
     const skip = (params.page - 1) * params.limit
-    const pipeline = [ 
+    const pipeline = [
+      {
+        $match: params.UserId ? { UserId: new ObjectId(params.UserId) } : {},
+      },
       {
         $match: params.search
           ? { name: { $regex: params.search, $options: "i" } } 
@@ -246,7 +250,6 @@ export default class RecipeModel {
     const recipes = this.getCollection()
     try {
       const result = await recipes.deleteOne({ slug, UserId: new ObjectId(UserId) })
-      console.log("result", result); // need validate
       if (result.deletedCount === 0) throw new CustomError("Forbidden", 403)
       return "Recipe deleted successfully"
     } catch (error) {
