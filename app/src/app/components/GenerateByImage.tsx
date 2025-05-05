@@ -4,6 +4,7 @@ import GenerateResult from "./GenerateResult";
 import { ObjectId } from "mongodb";
 import CustomError from "@/db/exeptions/customError";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface Recipe {
 	id: ObjectId;
@@ -131,7 +132,7 @@ export default function GenerateByImage() {
 					<div onClick={handleDropAreaClick} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} className={`w-full h-64 border-2 border-dashed rounded-lg flex items-center justify-center bg-gray-50 cursor-pointer mb-6 transition-all duration-300 relative overflow-hidden ${dragActive ? "border-red-500 bg-red-50 shadow-lg scale-105" : "border-gray-300"}`}>
 						<input type="file" accept="image/*" ref={inputRef} onChange={handleInputChange} className="hidden" />
 						{imagePreview ? (
-							<img key={imagePreview} src={imagePreview} alt="Preview" className="object-contain h-full w-full animate-fade-in" style={{ animation: "fadeIn 0.7s" }} />
+							<Image key={imagePreview} src={imagePreview} alt="Preview" className="object-contain h-full w-full animate-fade-in" style={{ animation: "fadeIn 0.7s" }} width={400} height={400} unoptimized={true} />
 						) : (
 							<div className="text-center p-6 flex flex-col items-center justify-center">
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-12 h-12 mx-auto mb-2 text-gray-400 transition-transform duration-300 ${dragActive ? "animate-bounce text-red-400" : ""}`} />
@@ -163,7 +164,7 @@ export default function GenerateByImage() {
 				<div className="mt-8">
 					{imagePreview && (
 						<div className="flex justify-center mb-8">
-							<img src={imagePreview} alt="Preview" className="max-h-64 rounded-lg shadow-md border border-gray-200 object-contain bg-white" style={{ maxWidth: "100%", margin: "0 auto" }} />
+							<Image src={imagePreview} alt="Preview" className="max-h-64 rounded-lg shadow-md border border-gray-200 object-contain bg-white" style={{ maxWidth: "100%", margin: "0 auto" }} width={400} height={400} unoptimized={true} />
 						</div>
 					)}
 					{/* Detected Ingredients */}
