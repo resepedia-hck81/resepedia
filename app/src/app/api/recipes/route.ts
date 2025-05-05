@@ -20,6 +20,7 @@ interface IIngredient {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const _id = searchParams.get("profilePage") ? request.headers.get("x-user-id") : null
     const page = parseInt(searchParams.get("page") || "1")
     const limit = parseInt(searchParams.get("limit") || "12")
     const sort = searchParams.get("sort") === "desc" ? -1 : 1
@@ -32,7 +33,8 @@ export async function GET(request: NextRequest) {
       sort,
       sortBy,
       filter,
-      search
+      search,
+      UserId: _id,
     })
     return NextResponse.json(result, { status: 200 })
   } catch (err) {
