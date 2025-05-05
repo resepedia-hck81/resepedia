@@ -116,6 +116,7 @@ export default function AddRecipe() {
         title: "Success",
         text: "Recipe added successfully!",
       });
+      router.push("/profile")
     } catch (err) {
       console.error("Error adding recipe:", err);
       if (err instanceof Error) {

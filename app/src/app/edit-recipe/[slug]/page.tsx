@@ -3,7 +3,7 @@ import { getRegions } from "@/app/action";
 import { IIngredient, IRecipe, IRegion } from "@/app/page";
 import { getRecipeBySlug } from "@/app/recipes/[slug]/action";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect, ChangeEvent } from "react";
 import { uploadToCatbox } from "./action";
 import Swal from "sweetalert2";
@@ -28,6 +28,7 @@ export default function EditRecipe() {
   });
   const [oldImageUrl, setOldImageUrl] = useState<string>("");
   const [regions, setRegions] = useState<IRegion[]>([]);
+  const router = useRouter();
 
   async function fetchRecipe() {
     const response = await getRecipeBySlug(slug);
@@ -126,6 +127,7 @@ export default function EditRecipe() {
         title: "Success",
         text: "Recipe edited successfully!",
       });
+      router.push("/profile")
     } catch (err) {
       console.error("Error editing recipe:", err);
       if (err instanceof Error) {
