@@ -130,7 +130,7 @@ export default function GenerateByName() {
 								</button>
 							)}
 							<button onClick={resetSearch} className="px-6 py-3 btn rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors">
-								Upload Another Image
+								New Search
 							</button>
 						</div>
 					</div>

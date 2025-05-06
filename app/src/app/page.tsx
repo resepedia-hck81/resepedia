@@ -126,13 +126,6 @@ export default function Home() {
 							</select>
 						</div>
 					</div>
-
-					{/* Loading Indicator */}
-					{/* {loading && (
-						<div className="flex justify-center">
-							<span className="loading loading-bars loading-lg text-red-600"></span>
-						</div>
-					)} */}
 					{loading && <Loading />}
 
 					{/* Recipe Card Grid */}
