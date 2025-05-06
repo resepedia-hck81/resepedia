@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
 	try {
 		const body = (await request.json()) as INotificationBody;
-		console.log("Midtrans notification body:", body);
+		// console.log("Midtrans notification body:", body);
 
 		// Validasi status transaksi
 		if (body.transaction_status !== "settlement" && body.transaction_status !== "capture" && body.transaction_status !== "pending" && body.transaction_status !== "deny" && body.transaction_status !== "cancel" && body.transaction_status !== "expire") {
@@ -143,9 +143,10 @@ export async function POST(request: NextRequest) {
 				// Simpan perubahan
 				await user.save();
 
-				console.log(`User ${userId} upgraded to premium status`);
-			} catch (userError) {
-				console.error("Error updating user premium status:", userError);
+				// console.log(`User ${userId} upgraded to premium status`);
+			} catch {
+				//(userError) {
+				// console.error("Error updating user premium status:", userError);
 				// Kita tetap lanjutkan karena order sudah diupdate sebagai dibayar
 			}
 		}
@@ -163,7 +164,7 @@ export async function POST(request: NextRequest) {
 		//   { status: 200 }
 		// );
 	} catch (error) {
-		console.error("Error processing Midtrans notification:", error);
+		// console.error("Error processing Midtrans notification:", error);
 
 		if (error instanceof CustomError) {
 			return NextResponse.json({ message: error.message }, { status: error.status });

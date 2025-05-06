@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 		resp.cookies.set("token", token, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 7 });
 		return resp;
 	} catch (err) {
-		console.log(err);
+		// console.log(err);
 		if (err instanceof MongoloquentNotFoundException) return NextResponse.json({ message: "User does not exist" }, { status: 400 });
 		return NextResponse.json({ message: "ISE" }, { status: 500 });
 	}

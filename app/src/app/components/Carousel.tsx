@@ -16,7 +16,6 @@ export default function Carousel() {
 				});
 				const data = await response.json();
 				setUser(data);
-				console.log(data);
 			} catch {
 				setUser({ name: "Anonymous", premium: false });
 			}

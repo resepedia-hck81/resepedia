@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
 			{ status: 201 }
 		);
 	} catch (error: unknown) {
-		console.error("🐄 - POST - error:", error);
+		// console.error("🐄 - POST - error:", error);
 
 		if (error instanceof CustomError) {
 			return NextResponse.json({ message: error.message }, { status: error.status });

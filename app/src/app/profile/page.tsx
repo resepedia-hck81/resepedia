@@ -84,11 +84,11 @@ export default function Profile() {
 					dataCount: data.dataCount,
 					totalDataCount: data.totalDataCount,
 				});
-			} else {
-				console.error("Failed to fetch user recipes");
+				// } else {
+				// 	console.error("Failed to fetch user recipes");
 			}
-		} catch (error) {
-			console.error("Error fetching user recipes:", error);
+			// } catch (error) {
+			// 	console.error("Error fetching user recipes:", error);
 		} finally {
 			setIsLoadingRecipes(false);
 		}
@@ -98,7 +98,7 @@ export default function Profile() {
 		try {
 			// Pastikan user._id ada sebelum membuat request
 			if (!user._id) {
-				console.error("User ID is missing");
+				// console.error("User ID is missing");
 				return;
 			}
 
@@ -116,8 +116,9 @@ export default function Profile() {
 					sessionStorage.setItem("paymentRedirectUrl", data.order.midtransRedirectUrl);
 				}
 			}
-		} catch (error) {
-			console.error("Error fetching pending orders:", error);
+		} catch {
+			//(error) {
+			// console.error("Error fetching pending orders:", error);
 		}
 	}
 
@@ -161,7 +162,7 @@ export default function Profile() {
 			router.push("/login");
 		} else {
 			swal.error(500, "Logout failed");
-			console.error("Logout failed");
+			// console.error("Logout failed");
 		}
 	};
 
@@ -216,8 +217,9 @@ export default function Profile() {
 			} else {
 				throw new Error("No redirect URL received");
 			}
-		} catch (error) {
-			console.error("Payment error:", error);
+		} catch {
+			//(error) {
+			// console.error("Payment error:", error);
 			Swal.fire({
 				icon: "error",
 				title: "Payment Error",
@@ -275,7 +277,7 @@ export default function Profile() {
 				}
 			});
 		} catch (error) {
-			console.error("Error deleting recipe:", error);
+			// console.error("Error deleting recipe:", error);
 			Swal.fire({
 				icon: "error",
 				title: "Error",

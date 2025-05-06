@@ -8,8 +8,9 @@ let db: Db;
 function connect() {
 	try {
 		db = client.db("resepedia");
-	} catch (error) {
-		console.log("🚀 ~ run ~ error:", error);
+	} catch {
+		//(error) {
+		// console.log("🚀 ~ run ~ error:", error);
 	}
 }
 

@@ -26,7 +26,6 @@ export const gemini = async (prompt: string | File, schema?: object, systemInstr
 			const candidate = result.candidates[0];
 			if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) return JSON.parse(candidate.content.parts[0].text || "{}");
 		}
-		console.error("No valid response text found from Gemini.");
 		return null;
 	} catch (error: unknown) {
 		throw new Error(error instanceof Error ? error.message : "Unknown error occurred during Gemini API call.");
