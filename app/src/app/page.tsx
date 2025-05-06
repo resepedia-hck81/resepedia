@@ -53,6 +53,7 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [region, setRegion] = useState("");
   const [loading, setLoading] = useState(true);
+  
 
   async function fetchRecipes() {
     const response = await getRecipes(search, region, recipes.page);
@@ -103,82 +104,97 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Carousel di bagian atas */}
-      <div className="carousel w-full max-h-[150px] overflow-hidden">
-        <div id="slide1" className="carousel-item relative w-full">
-          <div className="w-full h-[300px] relative">
-            <Image
-              src="https://cdn1-production-images-kly.akamaized.net/9bmk2g8V5iJrwaPYgto-JsFzmvQ=/0x482:5921x3820/1200x675/filters:quality(75):strip_icc():format(jpeg)/kly-media-production/medias/3005563/original/092180800_1577336519-shutterstock_320422139.jpg"
-              alt="Food Banner 1"
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-          <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-            <Link href="#" className="btn btn-circle">
-              ❮
-            </Link>
-            <Link href="#slide2" className="btn btn-circle">
-              ❯
-            </Link>
-          </div>
-        </div>
-        <div id="slide2" className="carousel-item relative w-full">
-          <div className="w-full h-[300px] relative">
-            <Image
-              src="https://png.pngtree.com/thumb_back/fh260/back_pic/03/53/33/45579720d58a73c.jpg"
-              alt="Food Banner 2"
-              fill
-              className="object-cover"
-            />
-          </div>
-          <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-            <Link href="#slide1" className="btn btn-circle">
-              ❮
-            </Link>
-            <Link href="#slide3" className="btn btn-circle">
-              ❯
-            </Link>
-          </div>
-        </div>
-        <div id="slide3" className="carousel-item relative w-full">
-          <div className="w-full h-[300px] relative">
-            <Image
-              src="https://png.pngtree.com/thumb_back/fh260/background/20190222/ourmid/pngtree-black-fashion-summer-hot-pot-food-vegetable-seasoning-potseasoningsummervegetablescornonionchiliblackfashionfoodbanner-image_50572.jpg"
-              alt="Food Banner 3"
-              fill
-              className="object-cover"
-            />
-          </div>
-          <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-            <Link href="#slide2" className="btn btn-circle">
-              ❮
-            </Link>
-            <Link href="#slide4" className="btn btn-circle">
-              ❯
-            </Link>
-          </div>
-        </div>
-        <div id="slide4" className="carousel-item relative w-full">
-          <div className="w-full h-[300px] relative">
-            <Image
-              src="https://img.pikbest.com/backgrounds/20190227/brown-simple-flat-food-banner-background_1867052.jpg!bw700"
-              alt="Food Banner 4"
-              fill
-              className="object-cover"
-            />
-          </div>
-          <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-            <Link href="#slide3" className="btn btn-circle">
-              ❮
-            </Link>
-            <Link href="#" className="btn btn-circle">
-              ❯
-            </Link>
-          </div>
+{/* Carousel */}
+<div className="carousel w-full max-h-[150px] overflow-hidden">
+  <div id="slide1" className="carousel-item relative w-full">
+    <div className="w-full h-[300px] relative">
+      <Image
+        src="https://cdn1-production-images-kly.akamaized.net/9bmk2g8V5iJrwaPYgto-JsFzmvQ=/0x482:5921x3820/1200x675/filters:quality(75):strip_icc():format(jpeg)/kly-media-production/medias/3005563/original/092180800_1577336519-shutterstock_320422139.jpg"
+        alt="Food Banner 1"
+        fill
+        className="object-cover brightness-70"
+        priority
+      />
+      <div className="absolute inset-0 flex items-center justify-center" style={{ transform: 'translateY(-75px)' }}>
+        <div className="text-center px-4">
+          <h1 className="text-5xl md:text-4xl lg:text-3xl font-black text-white tracking-tight leading-none mb-3 drop-shadow-[0_3px_5px_rgba(0,0,0,0.9)] font-['Playfair_Display']">
+            Let's Get Premium!
+          </h1>
+          <p className="text-xl md:text-2xl text-white font-medium drop-shadow-[0_2px_3px_rgba(0,0,0,0.8)] font-['Montserrat']">
+            Unlock unlimited generate recipes today!
+          </p>
         </div>
       </div>
+    </div>
+    <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
+      <Link href="#" className="btn btn-circle bg-white border-none hover:bg-black/50">
+        ❮
+      </Link>
+      <Link href="#slide2" className="btn btn-circle bg-white border-none hover:bg-black/50">
+        ❯
+      </Link>
+    </div>
+  </div>
+  
+  <div id="slide2" className="carousel-item relative w-full">
+    <div className="w-full h-[300px] relative">
+      <Image
+        src="https://png.pngtree.com/thumb_back/fh260/back_pic/03/53/33/45579720d58a73c.jpg"
+        alt="Food Banner 2"
+        fill
+        className="object-cover brightness-70"
+      />
+      <div className="absolute inset-0 flex items-center justify-center" style={{ transform: 'translateY(-75px)' }}>
+        <div className="text-center px-4">
+          <h1 className="text-5xl md:text-4xl lg:text-3xl font-black text-white tracking-tight leading-none mb-3 drop-shadow-[0_3px_5px_rgba(0,0,0,0.9)] font-['Playfair_Display']">
+            Let's Get Premium!
+          </h1>
+          <p className="text-xl md:text-2xl text-white font-medium drop-shadow-[0_2px_3px_rgba(0,0,0,0.8)] font-['Montserrat']">
+            Discover alternative ingredients!
+          </p>
+        </div>
+      </div>
+    </div>
+    <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
+      <Link href="#slide1" className="btn btn-circle bg-white border-none hover:bg-black/50">
+        ❮
+      </Link>
+      <Link href="#slide3" className="btn btn-circle bg-white border-none hover:bg-black/50">
+        ❯
+      </Link>
+    </div>
+  </div>
+  
+  <div id="slide3" className="carousel-item relative w-full">
+    <div className="w-full h-[300px] relative">
+      <Image
+        src="https://png.pngtree.com/thumb_back/fh260/background/20190222/ourmid/pngtree-black-fashion-summer-hot-pot-food-vegetable-seasoning-potseasoningsummervegetablescornonionchiliblackfashionfoodbanner-image_50572.jpg"
+        alt="Food Banner 3"
+        fill
+        className="object-cover brightness-70"
+      />
+      <div className="absolute inset-0 flex items-center justify-center" style={{ transform: 'translateY(-75px)' }}>
+        <div className="text-center px-4">
+          <h1 className="text-5xl md:text-4xl lg:text-3xl font-black text-white tracking-tight leading-none mb-3 drop-shadow-[0_3px_5px_rgba(0,0,0,0.9)] font-['Playfair_Display']">
+            Let's Get Premium!
+          </h1>
+          <p className="text-xl md:text-2xl text-white font-medium drop-shadow-[0_2px_3px_rgba(0,0,0,0.8)] font-['Montserrat']">
+            Make you a recipe base only on a photo?!
+          </p>
+        </div>
+      </div>
+    </div>
+    <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
+      <Link href="#slide2" className="btn btn-circle bg-white border-none hover:bg-black/50">
+        ❮
+      </Link>
+      <Link href="#slide3" className="btn btn-circle bg-white border-none hover:bg-black/50">
+        ❯
+      </Link>
+    </div>
+  </div>
+  
+</div>
 
       {/* Page Content */}
       <div className="py-8 px-6">
