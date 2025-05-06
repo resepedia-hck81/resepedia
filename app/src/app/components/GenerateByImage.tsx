@@ -74,8 +74,6 @@ export default function GenerateByImage() {
 				body: formData,
 			});
 			const data = await res.json();
-			console.log("Response from image analysis:", data);
-			console.log("Response:", res);
 
 			if (!res.ok) throw new CustomError(data.message, res.status);
 			setDetectedIngredients(data.ingredients || []);
@@ -83,34 +81,14 @@ export default function GenerateByImage() {
 			setShowAnalysisResult(true);
 			setActiveRecipeTab(0);
 		} catch (e: unknown) {
-			console.log("Error in handleAnalyzeIngredients:", e);
-
 			if (e instanceof CustomError) {
 				if (e.status === 402)
 					return swal.warn(
 						e.status,
 						e.message,
-						async () => {
-							try {
-								swal.loading("Processing payment...");
-								const response = await fetch("/api/order", {
-									method: "POST",
-									headers: { "Content-Type": "application/json" },
-								});
-
-								const data = await response.json();
-								if (!response.ok) throw new CustomError(data.message, response.status);
-								swal.close();
-
-								if (data.redirectUrl) window.open(data.redirectUrl, "_blank");
-								else throw new CustomError("No redirect URL received", 400);
-							} catch (error) {
-								console.error("Payment error:", error);
-								swal.error("Payment Error", "An error occurred while processing your payment.");
-							}
-						},
-						"Yes, proceed to payment",
-						"No, cancel"
+						() => router.push("/profile"),
+						"View Profile",
+						"Cancel"
 					);
 				if (e.status === 401) return swal.warn(e.status, e.message, () => router.push("/login"), "Login", "Cancel");
 				else return swal.error(e.status, e.message);

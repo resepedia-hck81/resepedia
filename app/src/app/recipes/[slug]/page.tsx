@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { IRecipe } from "@/app/page";
 import { getAlternativeIngredients, getRecipeBySlug } from "./action";
 import Swal from "sweetalert2";
+import swal from "@/app/components/Swal";
 
 interface IAlternative {
   [ingredient: string]: string[];
@@ -14,6 +15,7 @@ interface IAlternative {
 
 export default function RecipeDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const router = useRouter();
 
   const [recipe, setRecipe] = useState<IRecipe>({
     _id: "",
@@ -59,11 +61,29 @@ export default function RecipeDetail() {
     });
     const response = await getAlternativeIngredients(slug);
     if (response.error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Failed to generate alternative ingredients. Please try again later.",
-      });
+      if (response.message === "Unauthorized") {
+        swal.warn(
+          401,
+          "Please login or register if you want to access this feature.",
+          () => router.push("/login"),
+          "Login",
+          "Cancel"
+        );
+      } else if (response.message === "You don't have enough tokens") {
+        swal.warn(
+          402,
+          response.message,
+          () => router.push("/profile"),
+          "View Profile",
+          "Cancel"
+        );
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to generate alternative ingredients. Please try again later.",
+        });
+      }
       return;
     }
     const data: IAlternative[] = response.data;
