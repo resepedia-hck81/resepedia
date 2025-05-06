@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import { useState } from "react";
 import GenerateByImage from "../components/GenerateByImage";
 import GenerateByName from "../components/GenerateByName";
@@ -9,13 +8,6 @@ export default function GenerateRecipe() {
 
 	return (
 		<div className="container max-w-6xl mx-auto py-8 px-4">
-			<div className="mb-4">
-				<Link href="/" className="inline-block text-gray-700 hover:text-red-600 transition-colors">
-					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-						<path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-					</svg>
-				</Link>
-			</div>
 			<div className="text-center mb-8">
 				<h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Generate Your Perfect Recipe</h1>
 				<p className="text-gray-600 max-w-2xl mx-auto">Let us help you create delicious recipes based on your input!</p>
