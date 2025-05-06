@@ -17,7 +17,7 @@ export async function GET(request: NextRequest, Props: IProps) {
   } catch (err) {
     console.log("Error fetching recipes (API):", err)
     if (err instanceof CustomError) {
-      return NextResponse.json({ message: err.message }, { status: err.status })
+      return NextResponse.json({ message: err.message }, { status: err.status as number })
     }
     return NextResponse.json({ message: "ISE" }, { status: 500 })
   }
@@ -41,7 +41,7 @@ export async function PUT(request: NextRequest, Props: IProps) {
     if (ingredients.length < 1) {
       return NextResponse.json({ message: "Ingredients are required" }, { status: 400 })
     }
-    let newIngredients = ingredients
+    const newIngredients = ingredients
       .filter((ingredient) => ingredient.name || ingredient.measurement)
       .map((ingredient) => {
         if (!ingredient.name || !ingredient.measurement) {
@@ -61,7 +61,7 @@ export async function PUT(request: NextRequest, Props: IProps) {
   } catch (err) {
     console.log("Error updating recipe (API):", err)
     if (err instanceof CustomError) {
-      return NextResponse.json({ message: err.message }, { status: err.status })
+      return NextResponse.json({ message: err.message }, { status: err.status as number })
     } else if (err instanceof ZodError) {
       return NextResponse.json({ message: err.issues[0].message }, { status: 400 })
     } else if (err instanceof Error) {
@@ -83,7 +83,7 @@ export async function DELETE(request: NextRequest, Props: IProps) {
   } catch (err) {
     console.log("Error deleting recipe (API):", err)
     if (err instanceof CustomError) {
-      return NextResponse.json({ message: err.message }, { status: err.status })
+      return NextResponse.json({ message: err.message }, { status: err.status as number })
     }
     return NextResponse.json({ message: "ISE" }, { status: 500 })
   }

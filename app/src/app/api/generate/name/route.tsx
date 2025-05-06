@@ -6,12 +6,16 @@ import CustomError from "@/db/exeptions/customError";
 import { MongoloquentNotFoundException } from "mongoloquent";
 
 export const POST = async (request: NextRequest) => {
-	try {
-		const { name } = await request.json();
-		if (!name) return new CustomError("No name or description provided", 400);
-		const systemInstruction = [
-			{
-				text: `**Objective:** Generate exactly three distinct recipe recommendations for the specific food item provided in the input. The recipes should offer variations or different approaches to making the same dish.
+  try {
+    const { name } = await request.json();
+    if (!name)
+      return NextResponse.json(
+        { message: "No name or description provided" },
+        { status: 400 }
+      );
+    const systemInstruction = [
+      {
+        text: `**Objective:** Generate exactly three distinct recipe recommendations for the specific food item provided in the input. The recipes should offer variations or different approaches to making the same dish.
     
     **Input:**
     

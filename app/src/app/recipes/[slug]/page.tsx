@@ -30,14 +30,18 @@ export default function RecipeDetail() {
     author: "",
   });
   const [alternatives, setAlternatives] = useState<IAlternative[]>([]);
+  const [loading, setLoading] = useState(true);
 
   async function fetchRecipe() {
+    setLoading(true);
     const response = await getRecipeBySlug(slug);
     if (response.error) {
+      setLoading(false);
       return <h1>NOT FOUND</h1>;
     }
     const data: IRecipe = response.data;
     setRecipe(data);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -65,6 +69,14 @@ export default function RecipeDetail() {
     const data: IAlternative[] = response.data;
     setAlternatives(data);
     Swal.close();
+  }
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <span className="loading loading-bars loading-lg text-red-600"></span>
+      </div>
+    );
   }
 
   return (

@@ -69,7 +69,7 @@ export async function createMidtransTransaction(
       let errorJson;
       try {
         errorJson = JSON.parse(errorText);
-      } catch (e) {
+      } catch {
         errorJson = { message: errorText };
       }
       console.error('Midtrans Error:', errorJson);
