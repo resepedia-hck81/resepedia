@@ -23,6 +23,7 @@ export default function GenerateByImage() {
 	const [recommendedRecipes, setRecommendedRecipes] = useState<Recipe[]>([]);
 	const [activeRecipeTab, setActiveRecipeTab] = useState(0);
 	const [loading, setLoading] = useState(false);
+	const [recipeAdded, setRecipeAdded] = useState([false, false, false]);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const router = useRouter();
 
@@ -63,6 +64,30 @@ export default function GenerateByImage() {
 		inputRef.current?.click();
 	};
 
+	const handleAddRecipe = async (recipe: Recipe) => {
+		swal.loading("Adding recipe...");
+		try {
+			const res = await fetch("/api/recipes/ai", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(recipe),
+			});
+			const data = await res.json();
+			swal.close();
+			if (!res.ok) throw new CustomError(data.message, res.status);
+			swal.success("Recipe added successfully!");
+			setRecipeAdded((prev) => {
+				const newRecipeAdded = [...prev];
+				newRecipeAdded[activeRecipeTab] = true;
+				return newRecipeAdded;
+			});
+		} catch (e: unknown) {
+			swal.close();
+			if (e instanceof CustomError) swal.error(e.status, e.message);
+			else swal.error("Failed to add recipe", "An error occurred while processing your request.");
+		}
+	};
+
 	const handleAnalyzeIngredients = async () => {
 		if (!selectedImage) return;
 		setLoading(true);
@@ -82,14 +107,7 @@ export default function GenerateByImage() {
 			setActiveRecipeTab(0);
 		} catch (e: unknown) {
 			if (e instanceof CustomError) {
-				if (e.status === 402)
-					return swal.warn(
-						e.status,
-						e.message,
-						() => router.push("/profile"),
-						"View Profile",
-						"Cancel"
-					);
+				if (e.status === 402) return swal.warn(e.status, e.message, () => router.push("/profile"), "View Profile", "Cancel");
 				if (e.status === 401) return swal.warn(e.status, e.message, () => router.push("/login"), "Login", "Cancel");
 				else return swal.error(e.status, e.message);
 			}
@@ -170,7 +188,12 @@ export default function GenerateByImage() {
 						</div>
 						<GenerateResult recommendedRecipes={recommendedRecipes} activeRecipeTab={activeRecipeTab} />
 						<div className="mt-8 text-center">
-							<button onClick={() => setShowAnalysisResult(false)} className="px-6 py-3 rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors">
+							{!recipeAdded[activeRecipeTab] && (
+								<button onClick={() => handleAddRecipe(recommendedRecipes[activeRecipeTab])} className="px-6 mx-3 py-3 btn rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors">
+									Add To My Recipe
+								</button>
+							)}
+							<button onClick={() => setShowAnalysisResult(false)} className="px-6 py-3 btn rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors">
 								Upload Another Image
 							</button>
 						</div>
