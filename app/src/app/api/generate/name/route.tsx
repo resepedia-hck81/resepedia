@@ -52,7 +52,7 @@ export const POST = async (request: NextRequest) => {
 			},
 		];
 		const user = await User.findOrFail(request.headers.get("x-user-id") as string);
-		if (user.tokenCount <= 0) throw new CustomError("You don't have enough tokens", 402);
+		if (!user.isPremium && user.tokenCount <= 0) throw new CustomError("You don't have enough tokens", 402);
 		const result = await gemini(name, schema, systemInstruction);
 		await user.payToken();
 		return NextResponse.json(result, { status: 200 });
