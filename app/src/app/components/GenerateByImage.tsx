@@ -3,6 +3,8 @@ import swal from "./Swal";
 import GenerateResult from "./GenerateResult";
 import { ObjectId } from "mongodb";
 import CustomError from "@/db/exeptions/customError";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface Recipe {
 	id: ObjectId;
@@ -22,6 +24,7 @@ export default function GenerateByImage() {
 	const [activeRecipeTab, setActiveRecipeTab] = useState(0);
 	const [loading, setLoading] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const router = useRouter();
 
 	const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
 		e.preventDefault();
@@ -71,14 +74,47 @@ export default function GenerateByImage() {
 				body: formData,
 			});
 			const data = await res.json();
+			console.log("Response from image analysis:", data);
+			console.log("Response:", res);
+
 			if (!res.ok) throw new CustomError(data.message, res.status);
-			if (!data?.ingredients?.length) swal.error("No ingredients detected", "Please try again with a clearer image.");
 			setDetectedIngredients(data.ingredients || []);
 			setRecommendedRecipes(data.recipes || []);
 			setShowAnalysisResult(true);
 			setActiveRecipeTab(0);
 		} catch (e: unknown) {
-			if (e instanceof CustomError) return swal.error(e.status, e.message);
+			console.log("Error in handleAnalyzeIngredients:", e);
+
+			if (e instanceof CustomError) {
+				if (e.status === 402)
+					return swal.warn(
+						e.status,
+						e.message,
+						async () => {
+							try {
+								swal.loading("Processing payment...");
+								const response = await fetch("/api/order", {
+									method: "POST",
+									headers: { "Content-Type": "application/json" },
+								});
+
+								const data = await response.json();
+								if (!response.ok) throw new CustomError(data.message, response.status);
+								swal.close();
+
+								if (data.redirectUrl) window.open(data.redirectUrl, "_blank");
+								else throw new CustomError("No redirect URL received", 400);
+							} catch (error) {
+								console.error("Payment error:", error);
+								swal.error("Payment Error", "An error occurred while processing your payment.");
+							}
+						},
+						"Yes, proceed to payment",
+						"No, cancel"
+					);
+				if (e.status === 401) return swal.warn(e.status, e.message, () => router.push("/login"), "Login", "Cancel");
+				else return swal.error(e.status, e.message);
+			}
 			swal.error("Failed to analyze image", "An error occurred while processing your request.");
 		} finally {
 			setLoading(false);
@@ -96,7 +132,7 @@ export default function GenerateByImage() {
 					<div onClick={handleDropAreaClick} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} className={`w-full h-64 border-2 border-dashed rounded-lg flex items-center justify-center bg-gray-50 cursor-pointer mb-6 transition-all duration-300 relative overflow-hidden ${dragActive ? "border-red-500 bg-red-50 shadow-lg scale-105" : "border-gray-300"}`}>
 						<input type="file" accept="image/*" ref={inputRef} onChange={handleInputChange} className="hidden" />
 						{imagePreview ? (
-							<img key={imagePreview} src={imagePreview} alt="Preview" className="object-contain h-full w-full animate-fade-in" style={{ animation: "fadeIn 0.7s" }} />
+							<Image key={imagePreview} src={imagePreview} alt="Preview" className="object-contain h-full w-full animate-fade-in" style={{ animation: "fadeIn 0.7s" }} width={400} height={400} unoptimized={true} />
 						) : (
 							<div className="text-center p-6 flex flex-col items-center justify-center">
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-12 h-12 mx-auto mb-2 text-gray-400 transition-transform duration-300 ${dragActive ? "animate-bounce text-red-400" : ""}`} />
@@ -128,7 +164,7 @@ export default function GenerateByImage() {
 				<div className="mt-8">
 					{imagePreview && (
 						<div className="flex justify-center mb-8">
-							<img src={imagePreview} alt="Preview" className="max-h-64 rounded-lg shadow-md border border-gray-200 object-contain bg-white" style={{ maxWidth: "100%", margin: "0 auto" }} />
+							<Image src={imagePreview} alt="Preview" className="max-h-64 rounded-lg shadow-md border border-gray-200 object-contain bg-white" style={{ maxWidth: "100%", margin: "0 auto" }} width={400} height={400} unoptimized={true} />
 						</div>
 					)}
 					{/* Detected Ingredients */}

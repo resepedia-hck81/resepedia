@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { schema } from "../schema";
 import User from "@/db/models/Users";
 import CustomError from "@/db/exeptions/customError";
+import { MongoloquentNotFoundException } from "mongoloquent";
 
 export const POST = async (request: NextRequest) => {
 	try {
@@ -52,15 +53,17 @@ export const POST = async (request: NextRequest) => {
 			},
 		];
 		const user = await User.findOrFail(request.headers.get("x-user-id") as string);
+		if (user.tokenCount <= 0) throw new CustomError("You don't have enough tokens", 402);
 		const result = await gemini(image, schema, systemInstruction);
-		if (!result?.ingredients?.length) throw new CustomError("Please try again with a clearer image.", "No ingredients detected");
+		if (!result?.ingredients?.length) throw new CustomError("Please try again with a clearer image.", 400);
 		await user.payToken();
 		return NextResponse.json(result, { status: 200 });
 	} catch (error: unknown) {
 		console.error("Error in POST request:", error);
 		if (error instanceof TypeError) return NextResponse.json({ message: error.message });
 		if (error instanceof CustomError) return NextResponse.json({ message: error.message }, { status: error.status as number });
-		// if (error instanceof Error) return NextResponse.json({ message: error.message }, { status: 500 });
+		if (error instanceof MongoloquentNotFoundException) return NextResponse.json({ message: "Please login or register if you want to access this feature." }, { status: 401 });
+		if (error instanceof Error) return NextResponse.json({ message: error.message }, { status: 500 });
 		return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
 	}
 };
