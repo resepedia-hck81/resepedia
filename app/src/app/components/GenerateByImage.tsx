@@ -117,6 +117,16 @@ export default function GenerateByImage() {
 		}
 	};
 
+	const handleReset = () => {
+		setShowAnalysisResult(false);
+		setImagePreview(null);
+		setSelectedImage(null);
+		setDetectedIngredients([]);
+		setRecommendedRecipes([]);
+		setActiveRecipeTab(0);
+		setRecipeAdded([false, false, false]);
+	};
+
 	return (
 		<div>
 			<div className="text-center mb-6">
@@ -193,7 +203,7 @@ export default function GenerateByImage() {
 									Add To My Recipe
 								</button>
 							)}
-							<button onClick={() => setShowAnalysisResult(false)} className="px-6 py-3 btn rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors">
+							<button onClick={handleReset} className="px-6 py-3 btn rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors">
 								Upload Another Image
 							</button>
 						</div>

@@ -19,6 +19,7 @@ export default function GenerateByName() {
 	const [activeSearchRecipeTab, setActiveSearchRecipeTab] = useState(0);
 	const [showSearchResult, setShowSearchResult] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [recipeAdded, setRecipeAdded] = useState([false, false, false]);
 	const router = useRouter();
 
 	const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -38,14 +39,7 @@ export default function GenerateByName() {
 			setActiveSearchRecipeTab(0);
 		} catch (e: unknown) {
 			if (e instanceof CustomError) {
-				if (e.status === 402)
-					return swal.warn(
-						e.status,
-						e.message,
-						() => router.push("/profile"),
-						"View Profile",
-						"Cancel"
-					);
+				if (e.status === 402) return swal.warn(e.status, e.message, () => router.push("/profile"), "View Profile", "Cancel");
 				if (e.status === 401) return swal.warn(e.status, e.message, () => router.push("/login"), "Login", "Cancel");
 				else return swal.error(e.status, e.message);
 			}
@@ -54,10 +48,37 @@ export default function GenerateByName() {
 			setLoading(false);
 		}
 	};
+
+	const handleAddRecipe = async (recipe: Recipe) => {
+		swal.loading("Adding recipe...");
+		try {
+			const res = await fetch("/api/recipes/ai", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(recipe),
+			});
+			const data = await res.json();
+			swal.close();
+			if (!res.ok) throw new CustomError(data.message, res.status);
+			swal.success("Recipe added successfully!");
+			setRecipeAdded((prev) => {
+				const newRecipeAdded = [...prev];
+				newRecipeAdded[activeSearchRecipeTab] = true;
+				return newRecipeAdded;
+			});
+		} catch (e: unknown) {
+			swal.close();
+			if (e instanceof CustomError) swal.error(e.status, e.message);
+			else swal.error("Failed to add recipe", "An error occurred while processing your request.");
+		}
+	};
+
 	const resetSearch = () => {
 		setShowSearchResult(false);
 		setSearchQuery("");
 		setSearchResults([]);
+		setActiveSearchRecipeTab(0);
+		setRecipeAdded([false, false, false]);
 	};
 	return (
 		<div>
@@ -103,8 +124,13 @@ export default function GenerateByName() {
 						<GenerateResult recommendedRecipes={searchResults} activeRecipeTab={activeSearchRecipeTab} />
 						{/* Reset Search Button */}
 						<div className="mt-8 text-center">
-							<button onClick={resetSearch} className="px-6 py-3 rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors">
-								New Search
+							{!recipeAdded[activeSearchRecipeTab] && (
+								<button onClick={() => handleAddRecipe(searchResults[activeSearchRecipeTab])} className="px-6 mx-3 py-3 btn rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors">
+									Add To My Recipe
+								</button>
+							)}
+							<button onClick={resetSearch} className="px-6 py-3 btn rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors">
+								Upload Another Image
 							</button>
 						</div>
 					</div>
