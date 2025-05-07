@@ -51,6 +51,7 @@ export default function Home() {
 
 	const [regions, setRegions] = useState<IRegion[]>([]);
 	const [search, setSearch] = useState("");
+	const [debouncedSearch, setDebouncedSearch] = useState("");
 	const [region, setRegion] = useState("");
 	const [loading, setLoading] = useState(true);
 
@@ -85,6 +86,16 @@ export default function Home() {
 	}
 
 	useEffect(() => {
+		const handler = setTimeout(() => {
+			setDebouncedSearch(search)
+		}, 500);
+
+		return () => {
+			clearTimeout(handler);
+		}
+	}, [search])
+
+	useEffect(() => {
 		fetchRegions();
 	}, []);
 
@@ -99,7 +110,7 @@ export default function Home() {
 			result: [],
 		}));
 		fetchRecipes();
-	}, [search, region]);
+	}, [debouncedSearch, region]);
 
 	return (
 		<div className="flex flex-col min-h-screen">
