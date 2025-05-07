@@ -24,6 +24,14 @@ export default function RootLayout({
 	const hideNavRoutes = ["/login", "/register"];
 	const shouldShowSidebar = !hideNavRoutes.includes(pathname);
 
+	const showTitle = () => {
+		if (pathname === "/profile") return "Resepedia - Profile";
+		if (pathname === "/login") return "Resepedia - Login";
+		if (pathname === "/register") return "Resepedia - Register";
+		if (pathname === "/generate-recipe") return "Resepedia - Generate Recipe";
+		return "Resepedia";
+	}
+	
 	return (
 		<html lang="en" data-theme="light">
 			<head>
@@ -31,6 +39,7 @@ export default function RootLayout({
 				<link rel="icon" href="/favicon.ico" sizes="any" />
 				<link rel="icon" href="/RESEPEDIA-2.png" type="image/png" />
 				<link rel="apple-touch-icon" href="/RESEPEDIA-2.png" />
+				<title>{showTitle()}</title>
 			</head>
 			<body className={`${geistSans.variable} ${geistMono.variable} flex flex-row min-h-screen antialiased`}>
 				{shouldShowSidebar && <Sidebar />}
