@@ -104,14 +104,12 @@ export default function Home() {
 	return (
 		<div className="flex flex-col min-h-screen">
 			<Carousel />
-			{/* Page Content */}
 			<div className="py-8 px-6">
 				<div className="text-center">
 					<div className="text-center">
 						<h1 className="text-3xl font-bold text-gray-800 mb-6">Recipe List</h1>
 					</div>
 				</div>
-
 				<div className="container mx-auto mt-4 px-4">
 					<div className="flex justify-center mb-8">
 						<div className="flex gap-4 items-center justify-center w-full">
@@ -127,8 +125,6 @@ export default function Home() {
 						</div>
 					</div>
 					{loading && <Loading />}
-
-					{/* Recipe Card Grid */}
 					{!loading && (
 						<InfiniteScroll className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" dataLength={recipes.result.length} next={() => setRecipes((prev) => ({ ...prev, page: prev.page + 1 }))} hasMore={recipes.page < recipes.totalPages} loader={null} scrollThreshold={0.9}>
 							{recipes.result.map((recipe) => (

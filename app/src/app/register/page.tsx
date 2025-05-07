@@ -44,7 +44,6 @@ export default function Register() {
 
 	return (
 		<div className="flex min-h-screen">
-			{/* Back arrow */}
 			<div className="absolute top-4 left-4">
 				<Link href="/" className="inline-block text-gray-700 hover:text-red-600 transition-colors">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
@@ -52,11 +51,9 @@ export default function Register() {
 					</svg>
 				</Link>
 			</div>
-
-			{/* Left side - Register form */}
-			<div className="w-1/2 flex flex-col justify-center items-center bg-white p-10">
+			<div className="w-full sm:w-1/2 flex flex-col justify-center items-center bg-white p-6 sm:p-10">
 				<div className="w-full max-w-md">
-					<h1 className="text-3xl font-bold text-gray-800 mb-6">Create an Account</h1>
+					<h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">Create an Account</h1>
 					<form className="text-sm font-medium text-gray-800 mb-1 flex flex-col gap-4" onSubmit={handleSubmit}>
 						<div>
 							<label htmlFor="UserName" className="block text-sm font-medium text-gray-800 mb-1">
@@ -88,15 +85,11 @@ export default function Register() {
 					</p>
 				</div>
 			</div>
-
-			{/* Right side - Image */}
 			<div
-				className="w-1/2 bg-cover bg-center"
+				className="hidden sm:block sm:w-1/2 bg-cover bg-center"
 				style={{
 					backgroundImage: "url('https://images3.alphacoders.com/970/970431.jpg')",
-				}}>
-				{/* Background image bisa diganti sesuai kebutuhan */}
-			</div>
+				}}></div>
 		</div>
 	);
 }

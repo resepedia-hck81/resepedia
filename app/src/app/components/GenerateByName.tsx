@@ -112,24 +112,28 @@ export default function GenerateByName() {
 					</div>
 					<div className="border-t border-gray-200 pt-8">
 						<h2 className="text-2xl font-semibold text-gray-800 mb-6">Recommended Recipes</h2>
-						<div className="mb-6 border-b border-gray-200">
-							<div className="flex overflow-x-auto">
+						<div className="mb-6 border-b border-gray-200 overflow-x-auto scrollbar-hide">
+							<div className="flex gap-2 pb-2">
 								{searchResults.map((recipe, index) => (
-									<button key={index} onClick={() => setActiveSearchRecipeTab(index)} className={`px-6 py-3 font-medium whitespace-nowrap transition-colors ${activeSearchRecipeTab === index ? "border-b-2 border-red-600 text-red-600" : "text-gray-500 hover:text-gray-700"}`}>
+									<button
+										key={index}
+										onClick={() => setActiveSearchRecipeTab(index)}
+										className={`px-3 sm:px-4 py-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors rounded-lg flex-shrink-0 
+											${activeSearchRecipeTab === index ? "bg-red-50 text-red-600 border-b-2 border-red-500 font-semibold" : "text-gray-600 hover:bg-gray-50 hover:text-gray-800"}`}
+										aria-current={activeSearchRecipeTab === index ? "page" : undefined}>
 										{recipe.name}
 									</button>
 								))}
 							</div>
 						</div>
 						<GenerateResult recommendedRecipes={searchResults} activeRecipeTab={activeSearchRecipeTab} />
-						{/* Reset Search Button */}
-						<div className="mt-8 text-center">
+						<div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-center items-center gap-3">
 							{!recipeAdded[activeSearchRecipeTab] && (
-								<button onClick={() => handleAddRecipe(searchResults[activeSearchRecipeTab])} className="px-6 mx-3 py-3 btn rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors">
+								<button onClick={() => handleAddRecipe(searchResults[activeSearchRecipeTab])} className="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 btn rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors text-sm sm:text-base font-medium">
 									Add To My Recipe
 								</button>
 							)}
-							<button onClick={resetSearch} className="px-6 py-3 btn rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors">
+							<button onClick={resetSearch} className="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 btn rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors text-sm sm:text-base font-medium">
 								New Search
 							</button>
 						</div>

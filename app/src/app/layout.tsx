@@ -29,12 +29,12 @@ export default function RootLayout({
 			<head>
 				<link rel="manifest" href="/manifest.json" />
 				<link rel="icon" href="/favicon.ico" sizes="any" />
-				<link rel="icon" href="/RESEPEDIA-2.png" type="image/png" />
-				<link rel="apple-touch-icon" href="/RESEPEDIA-2.png" />
+				<link rel="icon" href="/icon-512.png" type="image/png" />
+				<link rel="apple-touch-icon" href="/icon-512.png" />
 			</head>
 			<body className={`${geistSans.variable} ${geistMono.variable} flex flex-row min-h-screen antialiased`}>
 				{shouldShowSidebar && <Sidebar />}
-				<div className={`min-h-screen bg-white ${shouldShowSidebar ? "flex-1" : "w-full"}`}>{children}</div>
+				<div className={`min-h-screen bg-white ${shouldShowSidebar ? "flex-1" : "w-full"} max-w-screen`}>{children}</div>
 			</body>
 		</html>
 	);
