@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 		const message = await RecipeModel.addRecipe({ ...body, UserId: _id, instruction: newInstruction, imageUrl: "https://files.catbox.moe/b6vx9b.png", RegionId: region?._id.toString() });
 		return NextResponse.json(message, { status: 201 });
 	} catch (err) {
-		console.log("Error adding recipe (API):", err);
+		// console.log("Error adding recipe (API):", err);
 		if (err instanceof CustomError) {
 			return NextResponse.json({ message: err.message }, { status: err.status as number });
 		} else if (err instanceof ZodError) {

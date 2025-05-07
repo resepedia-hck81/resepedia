@@ -9,8 +9,7 @@ export async function verify(token: string): Promise<{ _id: string; email: strin
 	try {
 		const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET));
 		return payload as { _id: string; email: string };
-	} catch (error) {
-		console.error("Verification error:", error);
+	} catch {
 		return null;
 	}
 }

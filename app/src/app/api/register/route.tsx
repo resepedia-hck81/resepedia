@@ -19,7 +19,7 @@ export const POST = async (request: NextRequest) => {
 		});
 		return NextResponse.json({ message: "Register success" }, { status: 201 });
 	} catch (err: unknown) {
-		console.log("Register error", err);
+		// console.log("Register error", err);
 		if (err instanceof NextResponse) return err;
 		return NextResponse.json({ message: err instanceof Error ? err.message : "Register failed" }, { status: 500 });
 	}

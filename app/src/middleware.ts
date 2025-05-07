@@ -15,7 +15,6 @@ export async function middleware(request: NextRequest) {
 		const { payload } = await jose.jwtVerify<{ _id: ObjectId; email: string }>(token.value, secret);
 		if (!payload._id || !payload.email) return new Response("Unauthorized", { status: 401 });
 		const requestHeaders = new Headers(request.headers);
-		console.log("User ID:", payload._id);
 		requestHeaders.set("x-user-id", payload._id.toString());
 		requestHeaders.set("x-user-email", payload.email);
 		const response = NextResponse.next({
@@ -27,7 +26,7 @@ export async function middleware(request: NextRequest) {
 	}
 
 	if (request.nextUrl.pathname.startsWith("/api")) {
-		if (request.nextUrl.pathname.match(/\/api\/(recipes|profile|order|generate)/)) {
+		if (request.nextUrl.pathname.match(/\/api\/(recipes|profile|order|generate|carousel)/)) {
 			const token = await findCookies();
 			if (!token) return;
 			return authentication(token);
