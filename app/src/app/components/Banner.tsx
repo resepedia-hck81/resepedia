@@ -7,8 +7,8 @@ export default function Banner({ id, imgUrl, title, text, prevHref, nextHref }: 
 				<Image src={imgUrl} alt="Food Banner 1" fill className="object-cover brightness-70" priority />
 				<div className="absolute inset-0 flex items-center justify-center" style={{ transform: "translateY(-75px)" }}>
 					<div className="text-center px-4">
-						<h1 className="text-5xl md:text-4xl lg:text-3xl font-black text-white tracking-tight leading-none mb-3 drop-shadow-[0_3px_5px_rgba(0,0,0,0.9)] font-['Playfair_Display']">{title}</h1>
-						<p className="text-xl md:text-2xl text-white font-medium drop-shadow-[0_2px_3px rgba(0,0,0,0.8)] font-['Montserrat']">{text}</p>
+						<h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-3xl font-black text-white tracking-tight leading-none mb-3 drop-shadow-[0_3px_5px_rgba(0,0,0,0.9)] font-['Playfair_Display']">{title}</h1>
+						<p className="text-lg sm:text-xl md:text-2xl text-white font-medium drop-shadow-[0_2px_3px rgba(0,0,0,0.8)] font-['Montserrat']">{text}</p>
 					</div>
 				</div>
 			</div>

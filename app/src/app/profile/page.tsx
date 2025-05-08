@@ -292,10 +292,10 @@ export default function Profile() {
 
 	const paginateRecipes = () => {
 		return (
-			<div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-				<div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+			<div className="flex items-center justify-between border-t border-gray-200 bg-white px-2 sm:px-4 py-3 sm:py-3">
+				<div className="flex flex-col sm:flex-row w-full sm:items-center sm:justify-between gap-3">
 					<div>
-						<p className="text-sm text-gray-700">
+						<p className="text-xs sm:text-sm text-gray-700">
 							Showing
 							<span className="font-medium">{` ${(pageNumber - 1) * 10 + 1} `}</span>
 							to
@@ -305,32 +305,37 @@ export default function Profile() {
 							recipes
 						</p>
 					</div>
-					<div>
+					<div className="flex justify-center sm:justify-end">
 						<nav className="isolate inline-flex -space-x-px rounded-md shadow-xs" aria-label="Pagination">
 							<button type="button" onClick={() => setPageNumber((prev) => Math.max(prev - 1, 1))} className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0" disabled={pageNumber === 1}>
 								<span className="sr-only">Previous</span>
-								<svg className="size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+								<svg className="size-4 sm:size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
 									<path fillRule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
 								</svg>
 							</button>
-							{Array.from({ length: pageDetail.totalPage }, (_, index) => {
-								if (index === 0 || index === pageDetail.totalPage - 1 || (pageNumber >= index - 1 && pageNumber <= index + 3)) {
-									return (
-										<button key={index + 1} onClick={() => setPageNumber(index + 1)} className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${pageNumber === index + 1 ? "bg-indigo-600 text-white" : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"}`}>
-											{index + 1}
-										</button>
-									);
-								} else if (pageNumber == index - 2 || pageNumber == index + 4) {
-									return (
-										<span key={index + 1} className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-											...
-										</span>
-									);
-								}
-							})}
+							<div className="hidden sm:flex">
+								{Array.from({ length: pageDetail.totalPage }, (_, index) => {
+									if (index === 0 || index === pageDetail.totalPage - 1 || (pageNumber >= index - 1 && pageNumber <= index + 3)) {
+										return (
+											<button key={index + 1} onClick={() => setPageNumber(index + 1)} className={`relative inline-flex items-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold ${pageNumber === index + 1 ? "bg-indigo-600 text-white" : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"}`}>
+												{index + 1}
+											</button>
+										);
+									} else if (pageNumber == index - 2 || pageNumber == index + 4) {
+										return (
+											<span key={index + 1} className="relative inline-flex items-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+												...
+											</span>
+										);
+									}
+								})}
+							</div>
+							<div className="flex sm:hidden items-center px-3 py-2 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-300">
+								Page {pageNumber} of {pageDetail.totalPage}
+							</div>
 							<button type="button" onClick={() => setPageNumber((prev) => prev + 1)} className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0" disabled={pageNumber === pageDetail.totalPage}>
 								<span className="sr-only">Next</span>
-								<svg className="size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+								<svg className="size-4 sm:size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
 									<path fillRule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
 								</svg>
 							</button>
@@ -525,55 +530,92 @@ export default function Profile() {
 									</Link>
 								</div>
 							) : (
-								<div className="overflow-x-auto">
-									<table className="min-w-full divide-y divide-gray-200">
-										<thead className="bg-gray-50">
-											<tr>
-												<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-													No
-												</th>
-												<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-													Name
-												</th>
-												<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-													Region
-												</th>
-												<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-													Actions
-												</th>
-											</tr>
-										</thead>
-										<tbody className="bg-white divide-y divide-gray-200">
-											{userRecipes.map((recipe, index) => (
-												<tr key={recipe._id} className="hover:bg-gray-50">
-													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{(pageNumber - 1) * 10 + index + 1}</td>
-													<td className="px-6 py-4 whitespace-nowrap">
-														<Link href={`/recipes/${recipe.slug}`} className="text-sm font-medium text-gray-900 hover:text-red-600 transition-colors">
-															{recipe.name}
-														</Link>
-													</td>
-													<td className="px-6 py-4 whitespace-nowrap">
-														<span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">{recipe.region}</span>
-													</td>
-													<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-														<div className="flex gap-2">
-															<button onClick={() => handleEditRecipe(recipe.slug)} className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 p-1.5 rounded-md" title="Edit Recipe">
-																<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-																	<path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-																</svg>
-															</button>
-															<button onClick={() => handleDeleteRecipe(recipe.slug)} className="text-red-600 hover:text-red-900 bg-red-50 p-1.5 rounded-md" title="Delete Recipe">
-																<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-																	<path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-																</svg>
-															</button>
-														</div>
-													</td>
+								<>
+									<div className="hidden sm:block overflow-x-auto">
+										<table className="min-w-full divide-y divide-gray-200">
+											<thead className="bg-gray-50">
+												<tr>
+													<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+														No
+													</th>
+													<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+														Name
+													</th>
+													<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+														Region
+													</th>
+													<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+														Actions
+													</th>
 												</tr>
+											</thead>
+											<tbody className="bg-white divide-y divide-gray-200">
+												{userRecipes.map((recipe, index) => (
+													<tr key={recipe._id} className="hover:bg-gray-50">
+														<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{(pageNumber - 1) * 10 + index + 1}</td>
+														<td className="px-6 py-4 whitespace-nowrap">
+															<Link href={`/recipes/${recipe.slug}`} className="text-sm font-medium text-gray-900 hover:text-red-600 transition-colors">
+																{recipe.name}
+															</Link>
+														</td>
+														<td className="px-6 py-4 whitespace-nowrap">
+															<span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">{recipe.region}</span>
+														</td>
+														<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+															<div className="flex gap-2">
+																<button onClick={() => handleEditRecipe(recipe.slug)} className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 p-1.5 rounded-md" title="Edit Recipe">
+																	<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+																		<path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+																	</svg>
+																</button>
+																<button onClick={() => handleDeleteRecipe(recipe.slug)} className="text-red-600 hover:text-red-900 bg-red-50 p-1.5 rounded-md" title="Delete Recipe">
+																	<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+																		<path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+																	</svg>
+																</button>
+															</div>
+														</td>
+													</tr>
+												))}
+											</tbody>
+										</table>
+									</div>
+
+									<div className="sm:hidden">
+										<div className="space-y-3">
+											{userRecipes.map((recipe, index) => (
+												<div key={recipe._id} className="bg-white p-4 border border-gray-200 rounded-lg shadow-sm">
+													<div className="flex justify-between items-start mb-2">
+														<div>
+															<Link href={`/recipes/${recipe.slug}`} className="text-base font-medium text-gray-900 hover:text-red-600 transition-colors">
+																{recipe.name}
+															</Link>
+															<div className="flex items-center mt-1.5">
+																<span className="px-2 py-1 text-xs leading-none font-medium rounded-full bg-gray-100 text-gray-800">{recipe.region}</span>
+															</div>
+														</div>
+														<div className="text-xs text-gray-500 font-medium">#{(pageNumber - 1) * 10 + index + 1}</div>
+													</div>
+
+													<div className="flex justify-end gap-2 mt-3 pt-3 border-t border-gray-100">
+														<button onClick={() => handleEditRecipe(recipe.slug)} className="flex items-center justify-center gap-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded text-xs font-medium transition-colors">
+															<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
+																<path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+															</svg>
+															Edit
+														</button>
+														<button onClick={() => handleDeleteRecipe(recipe.slug)} className="flex items-center justify-center gap-1 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded text-xs font-medium transition-colors">
+															<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
+																<path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+															</svg>
+															Delete
+														</button>
+													</div>
+												</div>
 											))}
-										</tbody>
-									</table>
-								</div>
+										</div>
+									</div>
+								</>
 							)}
 							{paginateRecipes()}
 						</div>

@@ -43,7 +43,7 @@ export default function RootLayout({
 			</head>
 			<body className={`${geistSans.variable} ${geistMono.variable} flex flex-row min-h-screen antialiased`}>
 				{shouldShowSidebar && <Sidebar />}
-				<div className={`min-h-screen bg-white ${shouldShowSidebar ? "flex-1" : "w-full"}`}>{children}</div>
+				<div className={`min-h-screen bg-white ${shouldShowSidebar ? "flex-1" : "w-full"} max-w-screen`}>{children}</div>
 			</body>
 		</html>
 	);
